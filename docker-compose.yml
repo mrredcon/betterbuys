@@ -1,0 +1,35 @@
+version: '3.8'
+
+# Services
+services:
+    # PHP Service
+    php:
+        build:
+            dockerfile: php-dockerfile
+        volumes:
+            - './www:/var/www/html'
+        depends_on:
+            - mysql
+
+    # Nginx Service
+    nginx:
+        image: nginx:latest
+        ports:
+            - 30000:80
+        volumes:
+            - './www:/var/www/html'
+            - './nginx-conf:/etc/nginx/conf.d'
+        depends_on:
+            - php
+
+    # MySQL Service
+    mysql:
+        image: mysql:8.3
+        environment:
+            MYSQL_ROOT_PASSWORD: helloworld
+        volumes:
+            - mysqldata:/var/lib/mysql
+
+# Volumes
+volumes:
+    mysqldata:
