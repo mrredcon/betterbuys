@@ -10,6 +10,14 @@ services:
             - './www:/var/www/html'
         depends_on:
             - mysql
+        environment:
+            DB_HOSTNAME: 'mysql'
+            DB_PORT: '3306'
+            DB_USERNAME: 'root'
+            DB_PASSWORD_FILE: /run/secrets/db_root_password
+            DB_NAME: 'betterbuys'
+        secrets:
+            - db_root_password
 
     # Nginx Service
     nginx:
@@ -26,9 +34,18 @@ services:
     mysql:
         image: mysql:8.3
         environment:
-            MYSQL_ROOT_PASSWORD: helloworld
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+        ports:
+            - 30001:3306
         volumes:
             - mysqldata:/var/lib/mysql
+        secrets:
+            - db_root_password
+
+# Secrets
+secrets:
+    db_root_password:
+        file: db_root_password.txt
 
 # Volumes
 volumes:

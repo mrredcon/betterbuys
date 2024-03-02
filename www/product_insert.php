@@ -2,7 +2,7 @@
 	$pdo = require_once 'connect.php';
 	
 	// insert a single product
-	$sql = 'INSERT INTO Product (Name, Description) VALUES(:name, :desc)';
+	$sql = 'INSERT INTO Product (name, description) VALUES(:name, :desc)';
 	
 	$statement = $pdo->prepare($sql);
 	

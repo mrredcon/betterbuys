@@ -10,7 +10,7 @@
 
 		$pdo = require 'connect.php';
 		
-		$sql = 'SELECT Id, Name, Description FROM Product';
+		$sql = 'SELECT id, name, description FROM Product';
 		
 		$statement = $pdo->query($sql);
 		
@@ -28,9 +28,9 @@
 				// show the products as a table
 				foreach ($products as $product) {
 					echo "<tr>";
-						echo "<td>" . $product['Id'] . '</td>';
-						echo "<td>" . $product['Name'] . '</td>';
-						echo "<td>" . $product['Description'] . '</td>';
+						echo "<td>" . $product['id'] . '</td>';
+						echo "<td>" . $product['name'] . '</td>';
+						echo "<td>" . $product['description'] . '</td>';
 					echo "</tr>";
 				}
 			echo "</table>";
