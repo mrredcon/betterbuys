@@ -1,4 +1,0 @@
-Hello world!
-
-I should live in 
-ENV PHP_INI_DIR /usr/local/etc/php
