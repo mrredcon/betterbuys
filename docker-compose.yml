@@ -8,6 +8,7 @@ services:
             dockerfile: php-dockerfile
         volumes:
             - './www:/var/www/html'
+            - './config/php:/usr/local/etc/php'
         depends_on:
             - mysql
         environment:
