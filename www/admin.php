@@ -81,8 +81,7 @@
 							echo '<input type="hidden" name="product_id" value="'. $product['id'].'">';
 							echo '<td>' .'<input type="submit" value="Delete">'. '</td>';	
 						echo '</form>';
-					
-						echo "</tr>";
+					echo "</tr>";
 				}
 			echo "</table>";
 		} else {
@@ -97,33 +96,17 @@
 		<form action="category_insert.php" method="post">
 			<label for="cname">Category name:</label><br>
 			<input type="text" id="cname" name="category_name"><br>
-
-			<label for="cparentid">Category parent id:</label><br>
-			<input type="text" id="cparentid" name="category_parent_id"><br>
-
 			<input type="submit" value="Add category">
 		</form>
 
+		<br>
+
 		<?php
 
-		// SELECT
-		// 	a.name,
-		// 	a.id
-		// FROM
-		// 	Category a
-		// 		LEFT JOIN
-		// 	Category b ON a.parentCategory = b.id
-		// ORDER BY a.name;
-		//
-		
 		$sql  = 'SELECT a.name, a.id, b.name AS parentCategoryName ';
 		$sql .= 'FROM Category a LEFT JOIN Category b ON a.parentCategory = b.id ';
 		$sql .= 'ORDER BY a.id';
 
-		// echo $sql;
-
-		//$sql = 'SELECT id, name FROM Category';
-		
 		$statement = $pdo->query($sql);
 		
 		// get all categories
@@ -142,7 +125,7 @@
 					$parentCategoryName = $category['parentCategoryName'];
 
 					if ($parentCategoryName == null) {
-						$parentCategoryName = 'N/A';
+						$parentCategoryName = '[None]';
 					}
 						
 
