@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html>
-	<head>
-	</head>
-	<body>
-		<h1>Welcome to Better Buys!</h1>
-		<a href="admin.php">Admin page</a>
-		<hr>
+<head>
+    <title>Welcome to Better Buys!</title>
+    <style>
+        .menu-item {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Better Buys!</h1>
+    <div class="menu">
+        <!-- Admin link -->
+        <a href="admin.php" class="menu-item">Admin page</a>
+
+        <!-- Register link -->
+        <a href="register.php" class="menu-item">Register</a>
+
+        <!-- Login link -->
+        <a href="login.php" class="menu-item">Login</a>
+
+		<!-- Profile link -->
+        <a href="profile.php?user_id=<?php echo $_SESSION['user_id']; ?>" class="menu-item">View Profile</a>
+    </div>
+    <hr>
+
 		<?php
 
 		$pdo = require 'connect.php';
