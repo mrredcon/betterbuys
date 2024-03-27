@@ -9,6 +9,7 @@ services:
         volumes:
             - './www:/var/www/html'
             - './config/php:/usr/local/etc/php'
+            - 'images:/images'
         depends_on:
             - mysql
         environment:
@@ -28,6 +29,7 @@ services:
         volumes:
             - './www:/var/www/html'
             - './nginx-conf:/etc/nginx/conf.d'
+            - 'images:/var/www/html/images'
         depends_on:
             - php
 
@@ -51,3 +53,4 @@ secrets:
 # Volumes
 volumes:
     mysqldata:
+    images:

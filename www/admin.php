@@ -17,15 +17,15 @@
 			<input type="submit" value="Delete database">
 		</form>
 
-		<hr>
+		<!-- <hr> -->
 
-		<h1>Product images</h1>
-		<form action="upload.php" method="post" enctype="multipart/form-data">
-			Select image to upload:<br>
-			<input type="file" name="fileToUpload" id="fileToUpload"><br>
-			<br>
-			<input type="submit" value="Upload Image" name="submit"><br>
-		</form>
+		<!-- <h1>Product images</h1> -->
+		<!-- <form action="upload.php" method="post" enctype="multipart/form-data"> -->
+		<!-- 	Select image to upload:<br> -->
+		<!-- 	<input type="file" name="fileToUpload" id="fileToUpload"><br> -->
+		<!-- 	<br> -->
+		<!-- 	<input type="submit" value="Upload Image" name="submit"><br> -->
+		<!-- </form> -->
 
 		<hr>
 		
@@ -54,7 +54,7 @@
 		
 		$statement = $pdo->query($sql);
 		
-		// get all publishers
+		// get all products
 		$products = $statement->fetchAll(PDO::FETCH_ASSOC);
 		
 		if ($products) {
