@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS `Product` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `description` MEDIUMTEXT NULL,
+  `price` DECIMAL(14,2) NOT NULL,
+  `salePrice` DECIMAL(14,2) NULL,
+  `quantity` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
 ENGINE = InnoDB;
@@ -165,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `Transaction` (
   `subtotal` DECIMAL(14,2) NOT NULL,
   `tax` DECIMAL(14,2) NOT NULL,
   `shippingFee` DECIMAL(14,2) NOT NULL,
+  `fulfilled` TINYINT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   INDEX `fk_userId_idx` (`userId` ASC) VISIBLE,
