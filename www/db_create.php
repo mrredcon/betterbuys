@@ -56,6 +56,9 @@ try {
 			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			  `name` VARCHAR(255) NOT NULL,
 			  `description` MEDIUMTEXT NULL,
+			  `price` DECIMAL(14,2) NOT NULL,
+			  `discount` DECIMAL(14,2) NULL,
+			  `quantity` INT UNSIGNED NOT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
 			ENGINE = InnoDB;
@@ -188,6 +191,7 @@ try {
 			  `subtotal` DECIMAL(14,2) NOT NULL,
 			  `tax` DECIMAL(14,2) NOT NULL,
 			  `shippingFee` DECIMAL(14,2) NOT NULL,
+			  `fulfilled` TINYINT NOT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
 			  INDEX `fk_userId_idx` (`userId` ASC) VISIBLE,
@@ -310,9 +314,9 @@ try {
 			SET SQL_MODE=@OLD_SQL_MODE;
 			SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 			SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-		");
+					");
 
-		$pdo->exec("INSERT INTO Product VALUES ( 1, 'The First Product', 'A product that may be purchased.' );");
+		$pdo->exec("INSERT INTO Product VALUES ( 1, 'The First Product', 'A product that may be purchased.', 0, 0, 0 );");
 		echo "Database created successfully.";
 	}
 } catch(PDOException $e) {

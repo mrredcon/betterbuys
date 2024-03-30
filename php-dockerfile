@@ -5,9 +5,10 @@ RUN apt-get update && \
     apt-get install -y zip libzip-dev libpng-dev
 
 # Installing additional PHP modules
-RUN docker-php-ext-install mysqli pdo pdo_mysql gd zip
+RUN docker-php-ext-install mysqli pdo pdo_mysql gd zip bcmath
 
 # Create directory to store images
 RUN mkdir /images
 RUN chmod 755 /images
 RUN chown www-data:www-data /images
+

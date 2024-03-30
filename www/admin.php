@@ -36,7 +36,13 @@
 			<input type="text" id="pname" name="name"><br>
 
 			<label for="pdesc">Description:</label><br>
-			<input type="text" id="pdesc" name="description">
+			<input type="text" id="pdesc" name="description"><br>
+
+			<label for="pprice">Price:</label><br>
+			<input type="text" id="pprice" name="price"><br>
+
+			<label for="pquantity">Quantity:</label><br>
+			<input type="text" id="pquantity" name="quantity"><br>
 
 			<br>
 
