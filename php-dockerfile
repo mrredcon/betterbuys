@@ -1,14 +1,38 @@
-FROM php:8.3-fpm
+# syntax=docker/dockerfile:1
 
+FROM composer:lts as prod-deps
+WORKDIR /app
+RUN --mount=type=bind,source=./composer.json,target=composer.json \
+    --mount=type=bind,source=./composer.lock,target=composer.lock \
+    --mount=type=cache,target=/tmp/cache \
+    composer install --no-dev --no-interaction
+
+FROM composer:lts as dev-deps
+WORKDIR /app
+RUN --mount=type=bind,source=./composer.json,target=composer.json \
+    --mount=type=bind,source=./composer.lock,target=composer.lock \
+    --mount=type=cache,target=/tmp/cache \
+    composer install --no-interaction
+
+FROM php:8.3-fpm as base
 # Installing dependencies for the PHP modules
 RUN apt-get update && \
     apt-get install -y zip libzip-dev libpng-dev
-
 # Installing additional PHP modules
 RUN docker-php-ext-install mysqli pdo pdo_mysql gd zip bcmath
-
 # Create directory to store images
 RUN mkdir /images
 RUN chmod 755 /images
 RUN chown www-data:www-data /images
+# Copy schema into image
+COPY schema-queries.sql /schema
+RUN chmod 644 /schema
 
+FROM base as development
+COPY "config/php/php.ini-development" "$PHP_INI_DIR/php.ini"
+COPY --from=dev-deps app/vendor/ /usr/local/lib/php/vendor
+
+FROM base as final
+COPY "config/php/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY --from=prod-deps app/vendor/ /usr/local/lib/php/vendor
+USER www-data

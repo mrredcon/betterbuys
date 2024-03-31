@@ -1,2 +1,5 @@
 # MySQL Workbench Backup file
 *.mwb.bak
+
+# Better Buys configuration file
+bb_config.ini

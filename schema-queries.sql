@@ -25,6 +25,24 @@ CREATE TABLE IF NOT EXISTS `User` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `PendingUser`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PendingUser` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `firstName` VARCHAR(255) NULL,
+  `lastName` VARCHAR(255) NULL,
+  `physicalAddress` VARCHAR(255) NULL,
+  `emailAddress` VARCHAR(255) NOT NULL,
+  `money` DECIMAL(14,2) NULL,
+  `isAdministrator` TINYINT NOT NULL,
+  `e164PhoneNumber` BIGINT UNSIGNED NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `confirmationCode` INT NOT NULL,
+  `dateCreated` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
+ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `Product`

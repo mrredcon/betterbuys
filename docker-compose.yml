@@ -6,19 +6,18 @@ services:
     php:
         build:
             dockerfile: php-dockerfile
+            context: .
+            target: development
         volumes:
             - './www:/var/www/html'
-            - './config/php:/usr/local/etc/php'
             - 'images:/images'
         depends_on:
             - mysql
         environment:
-            DB_HOSTNAME: 'mysql'
-            DB_PORT: '3306'
-            DB_USERNAME: 'root'
+            BB_CONFIG_FILE: /run/secrets/bb_config
             DB_PASSWORD_FILE: /run/secrets/db_root_password
-            DB_NAME: 'betterbuys'
         secrets:
+            - bb_config
             - db_root_password
 
     # Nginx Service
@@ -28,7 +27,7 @@ services:
             - 30000:80
         volumes:
             - './www:/var/www/html'
-            - './nginx-conf:/etc/nginx/conf.d'
+            - './config/nginx:/etc/nginx/conf.d:ro'
             - 'images:/var/www/html/images'
         depends_on:
             - php
@@ -49,6 +48,8 @@ services:
 secrets:
     db_root_password:
         file: db_root_password.txt
+    bb_config:
+        file: bb_config.ini
 
 # Volumes
 volumes:

@@ -27,7 +27,7 @@
 
 		<?php
 
-		$pdo = require 'connect.php';
+		$pdo = require_once 'connect.php';
 		
 		$sql = 'SELECT id, name, description FROM Product';
 		

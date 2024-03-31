@@ -1,0 +1,17 @@
+[database]
+db_hostname = "mysql"
+db_port     = "3306"
+db_username = "root"
+db_name = "betterbuys"
+
+[email]
+smtp_server = "smtp.example.com"
+smtp_port = "587"
+smtp_encryption = "starttls"
+smtp_from_address = "betterbuys@example.com"
+smtp_username = "bbmail"
+smtp_password = "s3cret"
+
+[web]
+base_url = "http://localhost:30000"
+
