@@ -10,6 +10,7 @@ services:
             target: development
         volumes:
             - './www:/var/www/html'
+            - './new_user_email.html:/new_user_email.html:ro'
             - 'images:/images'
         depends_on:
             - mysql

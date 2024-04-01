@@ -14,8 +14,26 @@ $pdo = require_once 'connect.php';
 // Check if user has submitted a form
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Retrieve form data
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    if (!$email) {
+	    echo 'Email given was either blank or in an invalid format.';
+	    exit();
+    }
+
+    $password = filter_input(INPUT_POST, 'password');
+    if (!$password) {
+	    echo 'Password given was either blank or in an invalid format.';
+    }
+
+    // Make sure the password fits our requirements
+    // Currently it is hardcoded to be at least 8 characters of
+    // alphanumeric characters including symbols and spaces
+    if (!preg_match('/[ -~]{8,}/', $password)) {
+	    echo 'Given password did not meet the strength requirements.<br>' .
+	    'Passwords must be at least 8 characters long, and ' .
+	    'contain only letters, symbols, and numbers.';
+	    exit();
+    }
 
     // Check if user's email is already in use
     $sql = "SELECT COUNT(*) AS count FROM `User` WHERE `emailAddress` = :email";
@@ -25,11 +43,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($result['count'] > 0) {
-        echo "Email address is already in use";
+        echo "Email address is already in use.";
         exit();
     }
 
-    // Check if user has a pending entry in the database
+    $config = get_config();
+
+    // Check if we have hit our pending user limit
+    $max_pending_users = (int)$config['max_pending_users'];
+    if ($max_pending_users <= 0) {
+	    die('Invalid configuration for max_pending_users.  Please enter a positive integer.');
+    }
+
+    $pending_count = $pdo->query('SELECT COUNT(*) FROM PendingUser');
+    $remaining = $max_pending_users - $pending_count->fetchColumn();
+    if ($remaining < 1) {
+    	// Purge any old entries from PendingUser
+	$rows_to_delete = ($remaining * -1) + 1;
+	$deleted = $pdo->query('DELETE FROM PendingUser ORDER BY date ASC LIMIT ' . $rows_to_delete);
+	echo 'Deleted ' . $deleted->fetchColumn() . ' pending users from the database.<br>';
+    }
+
+    // Check if this new user has a pending entry in the database
     // If there is a pending entry...delete it and start over
     $sql = "DELETE FROM PendingUser WHERE `emailAddress` = :email";
     $stmt = $pdo->prepare($sql);
@@ -42,18 +77,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     // Insert user info into the database (unconfirmed)
     $confirmation_code = random_int(1, 2147483647);
-    $sql = "INSERT INTO `PendingUser` (`emailAddress`, `isAdministrator`, `password`, `confirmationCode`, `dateCreated`) VALUES (:email, :isAdmin, :password, :code, :date)";
+    $sql = "INSERT INTO `PendingUser` (`emailAddress`, `password`, `confirmationCode`, `dateCreated`) VALUES (:email, :password, :code, :date)";
     $stmt = $pdo->prepare($sql);
 
     $stmt->execute([
         ':email' => $email,
-	':isAdmin' => (int)false, // mysql stores booleans as TINYINT
 	':password' => password_hash($password, PASSWORD_DEFAULT),
 	':code' => $confirmation_code,
 	':date' => date('Y-m-d H:i:s')
     ]);
 
-    $config = get_config();
+    $user_id = $pdo->lastInsertId();
 
     //Create a new PHPMailer instance
     $mail = new PHPMailer();
@@ -120,8 +154,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //convert HTML into a basic plain-text alternative body
     $mail->isHTML(true);
 
-    $uri = $config['base_url'] . '/confirm.php?code=' . $confirmation_code;
-    $mail->Body = 'Welcome to Better Buys!<br><a href="' . $uri . '">Click here to confirm your email address!</a>';
+    $params = array(
+	    "code" => $confirmation_code,
+	    "userid" => $user_id
+    );
+
+    $template = file_get_contents($config['new_user_email_file']);
+    if ($template == null || strlen($template) == 0) {
+	    die('New user registration email template file missing, check new_user_email_file in the configuration file and make sure that file exists.');
+    }
+
+    $uri = $config['base_url'] . '/confirm.php?' . http_build_query($params);
+    $msg_body = str_replace("CONFIRMATION_LINK_GOES_HERE", $uri, $template);
+    $mail->Body = $msg_body;
     
     //send the message, check for errors
     if (!$mail->send()) {
