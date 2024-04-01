@@ -19,3 +19,7 @@ base_url = "http://localhost:30000"
 max_pending_users = "1000"
 new_user_email_file = "/new_user_email.html"
 
+[admin]
+admin_login = "admin"
+admin_password = "very_s3cret!"
+

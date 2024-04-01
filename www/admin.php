@@ -4,6 +4,23 @@
 		<link href="minimal-table.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
+		<?php
+    			session_start();
+
+    			// Check if user is logged in
+    			if(!isset($_SESSION['user_id'])){
+    			    header("Location: login.php");
+    			    exit();
+    			}
+
+    			// Check if user is an administrator
+    			$is_admin = $_SESSION['is_admin'];
+			if (!$is_admin) {
+				echo 'Only administrators can view this page.';
+				exit();
+			}
+		?>
+
 		<a href="/index.html">Back to home page</a>
 		<hr>
 

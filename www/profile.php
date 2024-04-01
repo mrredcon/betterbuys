@@ -18,19 +18,24 @@
     $is_admin = $_SESSION['is_admin'];
 
     // System check for if user trying to access their account
-    if(!$is_admin && $_SESSION['user_id'] != $_GET['user_id']){
+    $user_to_show = filter_input(INPUT_GET, 'user_id');
+    if ($user_to_show && !$is_admin && $user_to_show != $_SESSION['user_id']) {
         // If not, deny access
         echo "Access Denied";
         exit();
     }
+    
+    // If we are missing the GET parameter, just assume user is viewing their own profile
+    if (!$user_to_show) {
+	    $user_to_show = $_SESSION['user_id'];
+    }
 
-    require 'connect.php';
+    $pdo = require_once 'connect.php';
 
     // Fetch user's profile info from the database
-    $user_id = $_GET['user_id'];
-    $sql = "SELECT * FROM 'User' WHERE 'id' = :user_id";
+    $sql = 'SELECT firstName, lastName, physicalAddress, emailAddress, money, e164PhoneNumber FROM User WHERE id=:user_id';
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $user_to_show, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -50,13 +55,13 @@
     echo "Money: $" . $user['money'] . "<br>";
 
     // Allow user to edit their profile
-    if ($is_admin || $_SESSION['user_id'] == $user_id) {
-     echo "<a href='edit_profile.php?user_id=$user_id'>Edit Profile</a>";
+    if ($is_admin || $_SESSION['user_id'] == $user_to_show) {
+     echo "<a href='edit_profile.php?user_id=$user_to_show'>Edit Profile</a><br>";
     }
 
     // Delete account link (only visible to logged-in user)
-    if ($_SESSION['user_id'] == $user_id) {
-        echo "<a href='account_delete.php?user_id=$user_id'>Delete Account</a>";
+    if ($_SESSION['user_id'] == $user_to_show) {
+        echo "<a href='account_delete.php?user_id=$user_to_show'>Delete Account</a><br>";
     }
 
     // Log out link
