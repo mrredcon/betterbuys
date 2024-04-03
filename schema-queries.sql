@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `Product` (
   `name` VARCHAR(255) NOT NULL,
   `description` MEDIUMTEXT NULL,
   `price` DECIMAL(14,2) NOT NULL,
-  `salePrice` DECIMAL(14,2) NULL,
+  `discount` DECIMAL(14,2) NULL,
   `quantity` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE)
