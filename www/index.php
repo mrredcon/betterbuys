@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,10 +11,12 @@
         }
     </style>
 </head>
+<form action="db_create.php" method="post">
+			<input type="submit" value="Create database">
+</form>
 <body>
     <h1>Welcome to Better Buys!</h1>
     <?php
-        session_start();
 	if(array_key_exists('login', $_SESSION)) {
             echo '<p>You\'re logged in as ' . $_SESSION['login'] . '.</p>';
 	}
