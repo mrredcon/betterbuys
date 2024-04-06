@@ -1,6 +1,11 @@
 <?php
+	if(!filter_input(INPUT_POST, 'remove')){
+	
 	$product_id = filter_input(INPUT_POST, 'product_id');
 	$order_amount = filter_input(INPUT_POST, 'amount');
+	if(!$order_amount || $order_amount < 1){
+		$order_amount = 1;
+	}
 	if ($product_id){
 		if(!isset($_COOKIE['shoppingCart'])){
 			$data = array($product_id=>$order_amount);
@@ -19,7 +24,23 @@
 		header("Refresh:0");
 	}
 	
-	
+	}
+	else{
+		$remove_id = filter_input(INPUT_POST, 'remove');
+		$remove_amount = filter_input(INPUT_POST, 'ramount');
+		if(!$remove_amount){
+			$remove_amount = 2147483647;
+		}
+		$data = json_decode($_COOKIE['shoppingCart'], true);
+		if($data[$remove_id] - $remove_amount < 1){
+			unset($data[$remove_id]);
+		}
+		else{
+			$data[$remove_id] = $data[$remove_id] - $remove_amount;
+		}
+		setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
+		header("Refresh:0");
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -69,6 +90,15 @@
 							echo '<td>' . sprintf('%.2f', $product['price'] * $item_array[$product['id']]) . '</td>';
 							$total += $product['price'] * $item_array[$product['id']];
 						}
+						?>
+						<td>
+							<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+								<input type="hidden" name="remove" value=<?php echo $product['id']?>>
+								<input type="submit" value="Remove">
+								<input type="text" id="ramount" name="ramount">
+							</form>
+						</td>
+						<?php
 					echo "</tr>";
 					
 				} 
