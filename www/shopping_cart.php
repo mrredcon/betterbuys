@@ -28,7 +28,7 @@
 	else{
 		$remove_id = filter_input(INPUT_POST, 'remove');
 		$remove_amount = filter_input(INPUT_POST, 'ramount');
-		if(!$remove_amount){
+		if(!$remove_amount || $remove_amount < 1){
 			$remove_amount = 2147483647;
 		}
 		$data = json_decode($_COOKIE['shoppingCart'], true);
