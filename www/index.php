@@ -14,6 +14,9 @@
 <form action="db_create.php" method="post">
 			<input type="submit" value="Create database">
 </form>
+<form action="dlt_cookie.php" method="post">
+			<input type="submit" value="Delete Your Cookies">
+</form>
 <body>
     <h1>Welcome to Better Buys!</h1>
     <?php
@@ -31,6 +34,9 @@
 	    if(array_key_exists('user_id', $_SESSION)) {
 		# Profile link
                 echo '<a href="profile.php" class="menu-item">View Profile</a>';
+				
+				# Shopping Cart link
+				echo '<a href="shopping_cart.php" class="menu-item">Shopping Cart</a>';
 
                 # Log out link
                 echo '<a href="logout.php" class="menu-item">Log Out</a>';
@@ -69,7 +75,16 @@
             				echo "<td>" . $product['id'] . '</td>';
             				echo "<td>" . $product['name'] . '</td>';
             				echo "<td>" . $product['description'] . '</td>';
-            			echo "</tr>";
+            			
+						
+							echo '<td>';
+								echo '<form method="post" action="shopping_cart.php">';
+									echo '<input type="hidden" name="product_id" value="'. $product['id'].'">';
+									echo '<input type="submit" value="Add to Cart">';
+									echo '<input type="text" id="oamount" name="amount">';
+								echo '</form>';
+							echo '</td>';
+						echo "</tr>";
             		}
             	echo "</table>";
             } else {
