@@ -1,5 +1,8 @@
 <?php
 	session_start();
+	ob_start();
+
+	
 ?>
 <!DOCTYPE html>
 <html>
@@ -172,6 +175,108 @@
 			}
 		?> 
 
+
+		<!-- ********************************************** -->
+		<!-- 					Stores						-->
+		<!-- ********************************************** -->
+		
+		
+		<hr>
+		<h1>Stores</h1>
+
+		<br>
+
+		<h2>Add Store</h2>
+		<form action="store_insert.php" method="post">
+			<label for="sname">Name:</label><br>
+			<input type="text" id="sname" name="name"><br>
+
+			<label for="saddress">Physical Address:</label><br>
+			<input type="text" id="saddress" name="physicalAddress"><br>
+
+			<label for="slatitude">Latitude:</label><br>
+			<input type="text" id="slatitude" name="latitude"><br>
+
+			<label for="slongitude">Longitude:</label><br>
+			<input type="text" id="slongitude" name="longitude"><br>
+
+			<label for="sonlineOnly">Online Only:</label><br>
+			<select id="sonlineOnly" name="onlineOnly">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</select><br>
+
+			<label for="snumber">Store Number:</label><br>
+			<input type="text" id="snumber" name="storeNumber"><br>
+
+			<input type="submit" value="Add Store">
+		</form>
+		
+		<?php
+		//fetch all stores
+		
+			try {
+				$sql = 'SELECT * FROM Store';
+				$statement = $pdo->query($sql);
+				$stores = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+				if ($stores) {
+					echo "<table>";
+						echo "<tr>";
+							echo "<th>Store ID</th>";
+							echo "<th>Store Number</th>";
+							echo "<th>Store Name</th>";
+							echo "<th>Store Location Address</th>";
+							echo "<th>Store Latitude</th>";
+							echo "<th>Store Longitude</th>";
+							echo "<th>Online Only</th>"; 
+							
+						echo "</tr>";
+
+					foreach ($stores as $store) {
+						echo "<tr>";
+							echo "<td>{$store['id']}</td>";
+							echo "<td>{$store['storeNumber']}</td>"; 
+							echo "<td>{$store['name']}</td>"; 
+							echo "<td>{$store['physicalAddress']}</td>";
+							echo "<td>{$store['latitude']}</td>";
+							echo "<td>{$store['longitude']}</td>";
+							echo "<td>" . ($store['onlineOnly'] ? "Yes" : "No") . "</td>";
+
+							echo "<td>";
+							echo "<a href='store_edit.php?id={$store['id']}'>Edit</a> ";
+							echo "<a href='store_delete.php?id={$store['id']}' onclick=\"return confirm('Are you sure?')\">Delete</a>";
+							echo "</td>";
+							echo "</tr>";
+							
+							if (isset($store['id'])) {
+								// It's safe to use $store['id'], so we proceed with echoing the form
+								echo '<td>';
+								echo '<form method="post" action="store_edit.php">';
+									echo '<input type="hidden" name="id" value="'. $store['id'].'">';
+									echo '<input type="submit" value="Edit">';
+								echo '</form>';
+								echo '</td>';
+							} else {
+								// $store['id'] is not set, so we do something else, like logging or displaying a message
+								echo '<td>Store ID is not set.</td>';
+
+							echo '<td>';
+							echo '<form method="post" action="store_delete.php">';
+								echo '<input type="hidden" name="id" value="'. $store['id'].'">';
+								echo '<input type="submit" value="Delete">';
+							echo '</form>';
+						echo "</tr>";
+					}}
+					echo "</table>";
+				} else {
+					echo "No stores found.";
+				}
+			} catch (PDOException $e) {
+				echo "Database error: " . $e->getMessage();
+				}
+		?>
+
 		<hr>
 		<h1>Pending Users</h1>
 
@@ -273,3 +378,4 @@
 		?>
 	</body>
 </html>
+<?php ob_end_flush(); ?> 
