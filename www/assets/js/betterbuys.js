@@ -80,11 +80,11 @@ btnSortName.addEventListener("click", () => {
 	sortName(btnSortName.value);
 
 	if (btnSortName.value === "asc") {
-		btnSortName.innerHTML = "Sort by name (Ascending)";
+		btnSortName.innerHTML = 'Sort by name <i class="icon-sort-by-alphabet"></i>';
 		btnSortPrice.innerHTML = "Sort by price";
 		btnSortName.value = "dsc";
 	} else if (btnSortName.value === "dsc") {
-		btnSortName.innerHTML = "Sort by name (Descending)";
+		btnSortName.innerHTML = 'Sort by name <i class="icon-sort-by-alphabet-alt"></i>';
 		btnSortPrice.innerHTML = "Sort by price";
 		btnSortName.value = "asc";
 	}
@@ -95,11 +95,11 @@ btnSortPrice.addEventListener("click", () => {
 	sortPrice(btnSortPrice.value);
 
 	if (btnSortPrice.value === "asc") {
-		btnSortPrice.innerHTML = "Sort by price (Ascending)";
+		btnSortPrice.innerHTML = 'Sort by price <i class="icon-sort-by-order"></i>';
 		btnSortName.innerHTML = "Sort by name";
 		btnSortPrice.value = "dsc";
 	} else if (btnSortPrice.value === "dsc") {
-		btnSortPrice.innerHTML = "Sort by price (Descending)";
+		btnSortPrice.innerHTML = 'Sort by price <i class="icon-sort-by-order-alt"></i>';
 		btnSortName.innerHTML = "Sort by name";
 		btnSortPrice.value = "asc";
 	}
