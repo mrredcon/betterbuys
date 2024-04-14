@@ -41,6 +41,10 @@
 
 		<hr>
 		
+		<!-- ********************************************** -->
+		<!-- 					Products					-->
+		<!-- ********************************************** -->
+
 		<h1>Products</h1>
 
 		<form action="product_insert.php" method="post">
@@ -109,6 +113,11 @@
 			echo "No products found!";
 		}
 	?>
+
+		<!-- ********************************************** -->
+		<!-- 					Categories					-->
+		<!-- ********************************************** -->
+
 	</form>
 
 		<hr>
@@ -154,13 +163,15 @@
 							echo "<td>" . $category['name'] . '</td>';
 							echo "<td>" . $parentCategoryName . '</td>';
 
-							echo '<td>';
-								echo '<form method="post" action="category_edit.php">';
-									echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
-									echo '<input type="submit" value="Edit">';
-								echo '</form>';
-							echo '</td>';
 
+						echo '<td>';
+							echo '<form method="post" action="category_edit.php">';
+								echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
+								echo '<input type="submit" value="Edit">';
+							echo '</form>';
+						echo '</td>';
+
+				
 							echo '<td>';
 								echo '<form method="post" action="category_delete.php">';
 									echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
@@ -213,69 +224,98 @@
 		</form>
 		
 		<?php
-		//fetch all stores
-		
-			try {
-				$sql = 'SELECT * FROM Store';
-				$statement = $pdo->query($sql);
-				$stores = $statement->fetchAll(PDO::FETCH_ASSOC);
+			try{
 
-				if ($stores) {
-					echo "<table>";
-						echo "<tr>";
-							echo "<th>Store ID</th>";
-							echo "<th>Store Number</th>";
-							echo "<th>Store Name</th>";
-							echo "<th>Store Location Address</th>";
-							echo "<th>Store Latitude</th>";
-							echo "<th>Store Longitude</th>";
-							echo "<th>Online Only</th>"; 
-							
-						echo "</tr>";
+			$sql = 'SELECT * FROM Store';
 
-					foreach ($stores as $store) {
-						echo "<tr>";
-							echo "<td>{$store['id']}</td>";
-							echo "<td>{$store['storeNumber']}</td>"; 
-							echo "<td>{$store['name']}</td>"; 
-							echo "<td>{$store['physicalAddress']}</td>";
-							echo "<td>{$store['latitude']}</td>";
-							echo "<td>{$store['longitude']}</td>";
-							echo "<td>" . ($store['onlineOnly'] ? "Yes" : "No") . "</td>";
+			$statement = $pdo->query($sql);
 
-							echo "<td>";
-							echo "<a href='store_edit.php?id={$store['id']}'>Edit</a> ";
-							echo "<a href='store_delete.php?id={$store['id']}' onclick=\"return confirm('Are you sure?')\">Delete</a>";
-							echo "</td>";
-							echo "</tr>";
-							
-							if (isset($store['id'])) {
-								// It's safe to use $store['id'], so we proceed with echoing the form
-								echo '<td>';
-								echo '<form method="post" action="store_edit.php">';
-									echo '<input type="hidden" name="id" value="'. $store['id'].'">';
-									echo '<input type="submit" value="Edit">';
-								echo '</form>';
-								echo '</td>';
-							} else {
-								// $store['id'] is not set, so we do something else, like logging or displaying a message
-								echo '<td>Store ID is not set.</td>';
+			// Fetch all stores
+			$stores = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-							echo '<td>';
-							echo '<form method="post" action="store_delete.php">';
-								echo '<input type="hidden" name="id" value="'. $store['id'].'">';
+			if ($stores) {
+				echo "<table>";
+					echo "<tr>";
+						echo "<th>Store ID</th>";
+						echo "<th>Store Number</th>";
+						echo "<th>Store Name</th>";
+						echo "<th>Store Location Address</th>";
+						echo "<th>Store Latitude</th>";
+						echo "<th>Store Longitude</th>";
+						echo "<th>Online Only</th>";
+						echo "<th>Actions</th>";
+					echo "</tr>";
+
+				foreach ($stores as $store) {
+					echo "<tr>";
+						echo "<td>{$store['id']}</td>";
+						echo "<td>{$store['storeNumber']}</td>"; 
+						echo "<td>{$store['name']}</td>"; 
+						echo "<td>{$store['physicalAddress']}</td>";
+						echo "<td>{$store['latitude']}</td>";
+						echo "<td>{$store['longitude']}</td>";
+						echo "<td>" . ($store['onlineOnly'] ? "Yes" : "No") . "</td>";
+
+						// Add forms for edit and delete actions
+
+						
+						echo "<td>";
+							echo '<form method="post" action="store_edit.php">';
+								echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
+								echo '<input type="submit" value="Edit">';
+							echo '</form>';
+					
+							echo '<form method="post" class="delete-form" action="store_delete.php">';
+								echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
 								echo '<input type="submit" value="Delete">';
 							echo '</form>';
-						echo "</tr>";
-					}}
-					echo "</table>";
-				} else {
-					echo "No stores found.";
+						echo "</td>";
+				
+					
+					echo "</tr>";
 				}
-			} catch (PDOException $e) {
+				echo "</table>";
+			} else {
+				echo "No stores found.";
+			}}
+
+			// Handle any errors
+			catch (PDOException $e) {
 				echo "Database error: " . $e->getMessage();
-				}
-		?>
+			}
+			?>
+
+							
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Handle edit success notification
+			if (sessionStorage.getItem('editSuccess') === 'true') {
+				alert('Store updated successfully!');
+				sessionStorage.removeItem('editSuccess'); // Clear the flag
+			}
+
+			// Handle delete success notification
+			if (sessionStorage.getItem('pendingDelete') === 'true') {
+				alert('Store deleted successfully!');
+				sessionStorage.removeItem('pendingDelete'); // Clear the flag
+			}
+
+			// Attach event listeners to all delete forms
+			document.querySelectorAll('.delete-form').forEach(form => {
+				form.addEventListener('submit', function(event) {
+					event.preventDefault(); // Prevent form from submitting immediately
+					if (confirm('Are you sure you want to delete this store?')) {
+						sessionStorage.setItem('pendingDelete', 'true');
+						this.submit(); // Submit the form if user confirms
+					}
+				});
+			});
+		});
+		</script>
+
+		<!-- ********************************************** -->
+		<!-- 				Pending Users					-->
+		<!-- ********************************************** -->
 
 		<hr>
 		<h1>Pending Users</h1>
@@ -322,6 +362,10 @@
 				echo "No pending users found!";
 			}
 		?> 
+
+		<!-- ********************************************** -->
+		<!-- 				Confirmed Users					-->
+		<!-- ********************************************** -->
 
 		<hr>
 		<h1>Confirmed Users</h1>

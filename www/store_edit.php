@@ -1,92 +1,100 @@
 <?php
+session_start(); // Start session at the beginning of your script
+ob_start(); // Start output buffering
 
-ob_start();
-
+// Include your database connection and other necessary setup
 $pdo = require_once 'connect.php';
-if (!$pdo) {
-    die("Failed to connect to the database.");
-}
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
+// Check and retrieve store details
+$store_id = filter_input(INPUT_POST, 'store_id', FILTER_SANITIZE_NUMBER_INT);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<pre>";
-    print_r($_POST);
-    echo "</pre>";
-
-
-    // Handle the form submission to update the store
-    $sql = "UPDATE Store SET name = :name, physicalAddress = :physicalAddress, latitude = :latitude, longitude = :longitude, onlineOnly = :onlineOnly, storeNumber = :storeNumber WHERE id = :id";
-    
+if ($store_id) {
+    $sql = "SELECT * FROM Store WHERE id = :store_id";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':name' => $_POST['name'],
-        ':physicalAddress' => $_POST['physicalAddress'],
-        ':latitude' => $_POST['latitude'],
-        ':longitude' => $_POST['longitude'],
-        ':onlineOnly' => $_POST['onlineOnly'],
-        ':storeNumber' => $_POST['storeNumber'],
-        ':id' => $_POST['id']
-    ]);
-    
-    header('Location: admin.php');
-    exit;
-} else {
-
-        $stmt = $pdo->prepare("SELECT * FROM Store WHERE id = :id");
-        $stmt->execute([':id' => $_GET['id']]);
-        $store = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        echo "<pre>"; // This will make the output more readable
-        var_dump($store);
-        echo "</pre>";
-
-
-    /*
-    Display the edit form with existing data
-    $sql = "SELECT * FROM Store WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':id' => $_GET['id']]);
+    $stmt->execute(['store_id' => $store_id]);
     $store = $stmt->fetch(PDO::FETCH_ASSOC);
-    */ 
-    if (!$store) {
-        echo "Store not found!";
-        exit;
-    }
+} else {
+    echo "No store selected.";
+    exit;
+}
 
+// Handle form submission to update the store
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $physicalAddress = $_POST['physicalAddress'] ?? '';
+    $latitude = filter_input(INPUT_POST, 'latitude', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $longitude = filter_input(INPUT_POST, 'longitude', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $onlineOnly = filter_input(INPUT_POST, 'onlineOnly', FILTER_SANITIZE_NUMBER_INT);
+    $storeNumber = $_POST['storeNumber'] ?? '';
+
+    if (!empty($name) && !empty($physicalAddress)) {
+        $sql = "UPDATE Store SET name = :name, physicalAddress = :physicalAddress, latitude = :latitude, longitude = :longitude, onlineOnly = :onlineOnly, storeNumber = :storeNumber WHERE id = :store_id";
+        $stmt = $pdo->prepare($sql);
+        $success = $stmt->execute([
+            ':name' => $name,
+            ':physicalAddress' => $physicalAddress,
+            ':latitude' => $latitude,
+            ':longitude' => $longitude,
+            ':onlineOnly' => $onlineOnly,
+            ':storeNumber' => $storeNumber,
+            ':store_id' => $store_id
+        ]);
+
+        if ($success) {
+            $_SESSION['updateSuccess'] = 'Store updated successfully!';
+            header('Location: admin.php');
+            exit;
+        } else {
+            echo "Failed to update store.";
+            $errorInfo = $stmt->errorInfo();
+            echo "Error: " . $errorInfo[2];
+        } 
+    }
 }
 ?>
 
-<?php if (!empty($store)): ?>
-<h2>Edit Store:</h2>
-		<form action="store_edit.php" method="post">
-			<label for="snumber">Store Number:</label><br>
-			<input type="text" id="snumber" name="storeNumber"><br>
-			
-			<label for="sname">Name:</label><br>
-			<input type="text" id="sname" name="name"><br>
 
-			<label for="saddress">Physical Address:</label><br>
-			<input type="text" id="saddress" name="physicalAddress"><br>
+<!DOCTYPE html>
+<html>
 
-			<label for="slatitude">Latitude:</label><br>
-			<input type="text" id="slatitude" name="latitude"><br>
+<hr>
+<h1>Stores</h1><hr><br>
 
-			<label for="slongitude">Longitude:</label><br>
-			<input type="text" id="slongitude" name="longitude"><br>
+<head>
+    <h2>Edit Store</h2>
+</head>
+<body>
+    <a href="admin.php">Admin page</a>
+    <h1>Edit Store</h1>
+    <form id="editForm" action="store_edit.php" method="post">
+        <input type="hidden" name="store_id" value="<?php echo htmlspecialchars($store_id); ?>">
+        <label>Name:</label><br>
+        <input type="text" name="name" value="<?php echo htmlspecialchars($store['name'] ?? ''); ?>"><br>
+        <label>Physical Address:</label><br>
+        <input type="text" name="physicalAddress" value="<?php echo htmlspecialchars($store['physicalAddress'] ?? ''); ?>"><br>
+        <label>Latitude:</label><br>
+        <input type="text" name="latitude" value="<?php echo htmlspecialchars($store['latitude'] ?? ''); ?>"><br>
+        <label>Longitude:</label><br>
+        <input type="text" name="longitude" value="<?php echo htmlspecialchars($store['longitude'] ?? ''); ?>"><br>
+        <label>Online Only:</label><br>
+        <select name="onlineOnly">
+            <option value="0" <?php echo ($store['onlineOnly'] ?? 0) == 0 ? 'selected' : ''; ?>>No</option>
+            <option value="1" <?php echo ($store['onlineOnly'] ?? 0) == 1 ? 'selected' : ''; ?>>Yes</option>
+        </select><br>
+        <label>Store Number:</label><br>
+        <input type="text" name="storeNumber" value="<?php echo htmlspecialchars($store['storeNumber'] ?? ''); ?>"><br>
+        <input type="submit" value="Update Store">
+    </form>
 
-			<label for="sonlineOnly">Online Only:</label><br>
-			<select id="sonlineOnly" name="onlineOnly">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
-			</select><br>
+    <script>
+        document.getElementById('editForm').addEventListener('submit', function() {
+            // Optionally we can add a confirmation here if needed
+            if (confirm('Are you sure you want to update this store?')) {
+                sessionStorage.setItem('editSuccess', 'true');
+            }
+        });
+    </script>
+</body>
+</html>
 
-			<input type="submit" value="Fix Typos Button">
 
-            </form>
-
- <?php else: ?>
-    <p>Store not found!</p> 
-<?php endif; 
-    ob_end_clean();?>

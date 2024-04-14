@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $stmt->execute([
         ':name' => $_POST['name'],
-        ':physicalAddress' => $_POST['physicalAddress'],
-        ':latitude' => $_POST['latitude'],
-        ':longitude' => $_POST['longitude'],
-        ':onlineOnly' => $_POST['onlineOnly'],
-        ':storeNumber' => $_POST['storeNumber'],
+        ':physicalAddress'  => $_POST['physicalAddress'],
+        ':latitude'         => $_POST['latitude'],
+        ':longitude'        => $_POST['longitude'],
+        ':onlineOnly'       => $_POST['onlineOnly'],
+        ':storeNumber'      => $_POST['storeNumber'],
     ]);
 
     // back to the admin page we go!
