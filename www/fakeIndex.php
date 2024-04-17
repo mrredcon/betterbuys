@@ -172,14 +172,15 @@
         <script>
         function initMap() {
             var bounds = new google.maps.LatLngBounds();
-            var map = new google.maps.Map(document.getElementById('map'), {
+            var map    = new google.maps.Map(document.getElementById('map'), {
                 zoom: 10 // Initial zoom, but will be overridden by fitBounds if there are markers
             });
 
             <?php if (!empty($stores)): ?>
                 <?php foreach ($stores as $store): ?>
-                    var position = new google.maps.LatLng(parseFloat("<?php echo $store['latitude']; ?>"), parseFloat("<?php echo $store['longitude']; ?>"));
-                    var marker = new google.maps.Marker({
+                    var position = new google.maps.LatLng(parseFloat("<?php echo $store['latitude']; ?>"), 
+                                                          parseFloat("<?php echo $store['longitude']; ?>"));
+                    var marker   = new google.maps.Marker({
                         position: position,
                         map: map,
                         title: "<?php echo htmlspecialchars($store['name']); ?>"
@@ -203,7 +204,7 @@
         }
     </script>
         
-        <!---------------------Map Functionality--------------------->
+        <!---------------------Map FunctionalityFin--------------------->
 
         </body>
     </html>
