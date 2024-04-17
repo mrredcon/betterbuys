@@ -67,9 +67,9 @@
 					}
 				?>
 
-				<form class="d-flex" role="search">
-					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-					<button class="btn btn-outline-success" type="submit"><i class="icon-search"></i></button>
+				<form class="d-flex" role="search" id="formSearch">
+					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="inputSearch">
+					<button class="btn btn-outline-success" type="submit" id="btnSearch"><i class="icon-search"></i></button>
 				</form>
 			</div>
 		</div>

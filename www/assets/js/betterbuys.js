@@ -1,3 +1,7 @@
+let products = null;
+let sortBy = 'name';
+let direction = 'asc';
+
 function drawProducts(products) {
 	let cardHtml = '';
 	for (const product of products) {
@@ -22,8 +26,6 @@ function drawProducts(products) {
 
 	$("#productcontainer").html(cardHtml);
 }
-
-let products = null;
 
 function sortPrice(direction) {
 	if (direction === "asc") {
@@ -77,6 +79,8 @@ function sortName(direction) {
 
 const btnSortName = document.querySelector("#btnSortName");
 btnSortName.addEventListener("click", () => {
+	direction = btnSortName.value;
+	sortBy = 'name';
 	sortName(btnSortName.value);
 
 	if (btnSortName.value === "asc") {
@@ -92,6 +96,8 @@ btnSortName.addEventListener("click", () => {
 
 const btnSortPrice = document.querySelector("#btnSortPrice");
 btnSortPrice.addEventListener("click", () => {
+	direction = btnSortPrice.value;
+	sortBy = 'price';
 	sortPrice(btnSortPrice.value);
 
 	if (btnSortPrice.value === "asc") {
@@ -105,11 +111,25 @@ btnSortPrice.addEventListener("click", () => {
 	}
 });
 
+$("#formSearch").submit(function(e){
+	e.preventDefault();
+	const inputSearch = document.querySelector("#inputSearch");
+	const query = inputSearch.value;
+
+	$.getJSON('/products.php?query=' + query)
+		.done(function(data, textStatus, jqXHR) {
+			products = data.data;
+			sortName("asc", products);
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			alert('Get failed! Error: ' + jqXHR.status + ' ' + errorThrown);
+		});
+});
+
 $.getJSON('/products.php')
 	.done(function(data, textStatus, jqXHR) {
-		products = data;
-		//drawProducts(data);
-		sortName("asc");
+		products = data.data;
+		sortName("asc", products);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		alert('Get failed! Error: ' + jqXHR.status + ' ' + errorThrown);
