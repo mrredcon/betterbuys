@@ -46,6 +46,9 @@
 
                 # Register link
                 echo '<a href="register.php" class="menu-item">Register</a>';
+				
+				# Shopping Cart link
+				echo '<a href="shopping_cart.php" class="menu-item">Shopping Cart</a>';
 	    }
         ?>
     </div>

@@ -170,13 +170,10 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `Transaction` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `userId` INT UNSIGNED NOT NULL,
-  `productId` INT UNSIGNED NOT NULL,
   `purchaseDate` DATETIME NOT NULL,
   `shippingAddress` VARCHAR(255) NULL,
   `storeId` INT UNSIGNED NOT NULL,
   `purchaseType` VARCHAR(45) NOT NULL,
-  `orderNumber` INT NOT NULL,
-  `quantity` INT NOT NULL,
   `subtotal` DECIMAL(14,2) NOT NULL,
   `tax` DECIMAL(14,2) NOT NULL,
   `shippingFee` DECIMAL(14,2) NOT NULL,
@@ -184,21 +181,40 @@ CREATE TABLE IF NOT EXISTS `Transaction` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   INDEX `fk_userId_idx` (`userId` ASC) VISIBLE,
-  INDEX `fk_productId_idx` (`productId` ASC) VISIBLE,
   INDEX `fk_storeId_idx` (`storeId` ASC) VISIBLE,
   CONSTRAINT `transaction_fk_userId`
     FOREIGN KEY (`userId`)
     REFERENCES `User` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `transaction_fk_productId`
-    FOREIGN KEY (`productId`)
-    REFERENCES `Product` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
   CONSTRAINT `transaction_fk_storeId`
     FOREIGN KEY (`storeId`)
     REFERENCES `Store` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `TransactionItem`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `TransactionItem` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `transactionId` INT UNSIGNED NOT NULL,
+  `productId` INT UNSIGNED NOT NULL,
+  `quantity` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  INDEX `fk_transactionId_idx` (`transactionId` ASC) VISIBLE,
+  INDEX `fk_productId_idx` (`productId` ASC) VISIBLE,
+  CONSTRAINT `transactionitem_fk_transactionId`
+    FOREIGN KEY (`transactionId`)
+    REFERENCES `Transaction` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `transactionitem_fk_productId`
+    FOREIGN KEY (`productId`)
+    REFERENCES `Product` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -231,31 +247,23 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `DiscountCode` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `productId` INT UNSIGNED NOT NULL,
+  `productId` INT UNSIGNED NULL,
   `usesRemaining` INT NULL,
   `userId` INT UNSIGNED NULL,
   `flatReduction` DECIMAL(14,2) NULL,
   `multiplierReduction` VARCHAR(45) NULL,
   `reductionType` VARCHAR(45) NOT NULL,
-  `parentDiscountCodeId` INT UNSIGNED NULL,
-  `code` VARCHAR(255) NULL,
-  `type` VARCHAR(45) NOT NULL,
-  `startDate` DATETIME NULL,
-  `expireDate` DATETIME NULL,
+  `code` VARCHAR(255) NOT NULL,
+  `startDate` DATETIME NOT NULL,
+  `expireDate` DATETIME NOT NULL,
   `enabled` TINYINT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   INDEX `fk_productId_idx` (`productId` ASC) VISIBLE,
-  INDEX `fk_parentDiscountCodeId_idx` (`parentDiscountCodeId` ASC) VISIBLE,
   CONSTRAINT `discountcode_fk_productId`
     FOREIGN KEY (`productId`)
     REFERENCES `Product` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `discountcode_fk_parentDiscountCodeId`
-    FOREIGN KEY (`parentDiscountCodeId`)
-    REFERENCES `DiscountCode` (`id`)
-    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 

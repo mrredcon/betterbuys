@@ -271,5 +271,82 @@
 				echo "No users found!";
 			}
 		?>
+		
+		<hr>
+		<form action="view_transactions.php" method="post">
+			<input type="submit" value="View All Transactions">
+		</form>
+		
+		<hr>
+		<form action="create_discount.php" method="post">
+			<input type="submit" value="Create Discount Codes">
+		</form>
+		<br>
+		
+		<?php
+			$sql  = 'SELECT id, code, reductionType, flatReduction, multiplierReduction, startDate, expireDate, productId, usesRemaining, userId, enabled FROM DiscountCode';
+
+			$statement = $pdo->query($sql);
+			
+			// get all pending users 
+			$discountCodes = $statement->fetchAll(PDO::FETCH_ASSOC);
+			
+			if ($discountCodes) {
+				echo "<table>";
+					echo "<tr>";
+						echo "<th>Id</th>";
+						echo "<th>Code</th>";
+						echo "<th>Type</th>";
+						echo "<th>Amount</th>";
+						echo "<th>Start</th>";
+						echo "<th>End</th>";
+						echo "<th>Product</th>";
+						echo "<th>User</th>";
+						echo "<th>Uses Left</th>";
+						echo "<th>Enabled</th>";
+					echo "</tr>";
+
+					// show the pending users as a table
+					foreach ($discountCodes as $discountCode) {
+						echo "<tr>";
+							echo "<td>" . $discountCode['id'] . '</td>';
+							echo "<td>" . $discountCode['code'] . '</td>';
+							echo "<td>" . $discountCode['reductionType'] . '</td>';
+							if($discountCode['reductionType'] === 'Flat'){
+								echo "<td>" . $discountCode['flatReduction'] . '</td>';
+							}
+							else{
+								echo "<td>" . $discountCode['multiplierReduction'] . '</td>';
+							}
+							echo "<td>" . $discountCode['startDate'] . '</td>';
+							echo "<td>" . $discountCode['expireDate'] . '</td>';
+							echo "<td>" . $discountCode['productId'] . '</td>';
+							echo "<td>" . $discountCode['userId'] . '</td>';
+							echo "<td>" . $discountCode['usesRemaining'] . '</td>';
+							$isEnabled = ($discountCode['enabled'] == 1 ? 'true' : 'false');
+							echo "<td>" . $isEnabled . '</td>';
+							
+							echo '<td>';
+								echo '<form method="post" action="edit_discount.php">';
+									echo '<input type="hidden" name="discountCodeId" value="'. $discountCode['id'].'">';
+									echo '<input type="submit" value="Edit">';
+								echo '</form>';
+							echo '</td>';
+
+							echo '<td>';
+								echo '<form method="post" action="delete.php">';
+									echo '<input type="hidden" name="id" value="'. $discountCode['id'].'">';
+									echo '<input type="hidden" name="table_name" value="DiscountCode">';
+									echo '<input type="submit" value="Delete">';
+								echo '</form>';
+							echo '</td>';
+						echo "</tr>";
+					}
+				echo "</table>";
+			} else {
+				echo "No discount codes found!";
+			}
+		?>
+		
 	</body>
 </html>
