@@ -1,5 +1,8 @@
 <?php
 	session_start();
+	ob_start();
+
+	
 ?>
 <!DOCTYPE html>
 <html>
@@ -38,6 +41,10 @@
 
 		<hr>
 		
+		<!-- ********************************************** -->
+		<!-- 					Products					-->
+		<!-- ********************************************** -->
+
 		<h1>Products</h1>
 
 		<form action="product_insert.php" method="post">
@@ -106,6 +113,11 @@
 			echo "No products found!";
 		}
 	?>
+
+		<!-- ********************************************** -->
+		<!-- 					Categories					-->
+		<!-- ********************************************** -->
+
 	</form>
 
 		<hr>
@@ -151,13 +163,15 @@
 							echo "<td>" . $category['name'] . '</td>';
 							echo "<td>" . $parentCategoryName . '</td>';
 
-							echo '<td>';
-								echo '<form method="post" action="category_edit.php">';
-									echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
-									echo '<input type="submit" value="Edit">';
-								echo '</form>';
-							echo '</td>';
 
+						echo '<td>';
+							echo '<form method="post" action="category_edit.php">';
+								echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
+								echo '<input type="submit" value="Edit">';
+							echo '</form>';
+						echo '</td>';
+
+				
 							echo '<td>';
 								echo '<form method="post" action="category_delete.php">';
 									echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
@@ -171,6 +185,127 @@
 				echo "No categories found!";
 			}
 		?> 
+
+
+		<!-- ********************************************** -->
+		<!-- 					Stores						-->
+		<!-- ********************************************** -->
+		
+		
+	<!-- Store Management Section -->
+<hr>
+<h1>Stores</h1>
+<h2>Add Store</h2>
+<form action="store_insert.php" method="post">
+    <label for="sname">Name:</label><br>
+    <input type="text" id="sname" name="name"><br>
+    <label for="saddress">Physical Address:</label><br>
+    <input type="text" id="saddress" name="physicalAddress"><br>
+    <label for="slatitude">Latitude:</label><br>
+    <input type="text" id="slatitude" name="latitude"><br>
+    <label for="slongitude">Longitude:</label><br>
+    <input type="text" id="slongitude" name="longitude"><br>
+    <label for="sonlineOnly">Online Only:</label><br>
+    <select id="sonlineOnly" name="onlineOnly">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+    </select><br>
+    <label for="snumber">Store Number:</label><br>
+    <input type="text" id="snumber" name="storeNumber"><br>
+    <input type="submit" value="Add Store">
+</form>
+
+<!-- Display Stores -->
+<?php
+try {
+    $sql = 'SELECT * FROM Store';
+    $statement = $pdo->query($sql);
+    $stores = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($stores) {
+        echo "<table>";
+        echo "<tr>";
+        echo "<th>Store ID</th><th>Store Number</th><th>Store Name</th><th>Store Location Address</th>";
+        echo "<th>Store Latitude</th><th>Store Longitude</th><th>Online Only</th><th>Actions</th>";
+        echo "</tr>";
+
+        foreach ($stores as $store) {
+            echo "<tr>";
+            echo "<td>{$store['id']}</td><td>{$store['storeNumber']}</td><td>{$store['name']}</td>";
+            echo "<td>{$store['physicalAddress']}</td><td>{$store['latitude']}</td><td>{$store['longitude']}</td>";
+            echo "<td>" . ($store['onlineOnly'] ? "Yes" : "No") . "</td>";
+            echo "<td>";
+            echo '<form method="post" action="store_edit.php">';
+            echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
+            echo '<input type="submit" value="Edit">';
+            echo '</form>';
+            echo '<form method="post" class="delete-form" action="store_delete.php">';
+            echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
+            echo '<input type="submit" value="Delete">';
+            echo '</form>';
+            echo "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No stores found.";
+    }
+} catch (PDOException $e) {
+    echo "Database error: " . $e->getMessage();
+}
+?>
+
+<!-- Inventory Management Section -->
+<hr>
+<h1>Inventory</h1>
+<h2>Add Inventory Item</h2>
+<form action="addStoreInv.php" method="post">
+    <label for="storeId">Store:</label>
+    <select name="storeId" id="storeId">
+        <?php foreach ($stores as $store): ?>
+            <option value="<?= htmlspecialchars($store['id']) ?>"><?= htmlspecialchars($store['name']) ?></option>
+        <?php endforeach; ?>
+    </select><br>
+    <label for="productId">Product:</label>
+    <select name="productId" id="productId">
+        <?php foreach ($products as $product): ?>
+            <option value="<?= htmlspecialchars($product['id']) ?>"><?= htmlspecialchars($product['name']) ?></option>
+        <?php endforeach; ?>
+    </select><br>
+    <label for="quantity">Quantity:</label>
+    <input type="number" name="quantity" id="quantity" min="1" required><br>
+    <input type="submit" value="Add to Inventory">
+    <!-- Button to Edit Inventory -->
+    <button type="button" onclick="window.location='editStoreInv.php'">Edit Inventory</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('editSuccess') === 'true') {
+        alert('Store updated successfully!');
+        sessionStorage.removeItem('editSuccess');
+    }
+    if (sessionStorage.getItem('pendingDelete') === 'true') {
+        alert('Store deleted successfully!');
+        sessionStorage.removeItem('pendingDelete');
+    }
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to delete this store?')) {
+                sessionStorage.setItem('pendingDelete', 'true');
+                this.submit();
+            }
+        });
+    });
+});
+</script>
+
+
+
+		<!-- ********************************************** -->
+		<!-- 				Pending Users					-->
+		<!-- ********************************************** -->
 
 		<hr>
 		<h1>Pending Users</h1>
@@ -217,6 +352,10 @@
 				echo "No pending users found!";
 			}
 		?> 
+
+		<!-- ********************************************** -->
+		<!-- 				Confirmed Users					-->
+		<!-- ********************************************** -->
 
 		<hr>
 		<h1>Confirmed Users</h1>
@@ -350,3 +489,4 @@
 		
 	</body>
 </html>
+<?php ob_end_flush(); ?> 
