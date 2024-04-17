@@ -29,7 +29,7 @@ COPY schema-queries.sql /schema
 RUN chmod 644 /schema
 
 FROM base as development
-COPY "config/php/php.ini-development" "$PHP_INI_DIR/php.ini"
+
 COPY --from=dev-deps app/vendor/ /usr/local/lib/php/vendor
 
 FROM base as final
