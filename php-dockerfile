@@ -27,6 +27,9 @@ RUN chown www-data:www-data /images
 # Copy schema into image
 COPY schema-queries.sql /schema
 RUN chmod 644 /schema
+# Copy english wordlst into image
+COPY words_alpha.txt /words.txt
+RUN chmod 644 /words.txt
 
 FROM base as development
 
