@@ -94,7 +94,7 @@
         echo "<h3>Add Credit</h3>";
         echo "<form method='post' action='add_credit.php'>";
         echo "<input type='hidden' name='user_id' value='$user_to_show'>";
-        echo "Amount: <input type='text' name='amount' required><br><br>";
+        echo "Amount: <input type='number' step='0.01' name='amount' required><br><br>";
         echo "<input type='submit' value='Add Credit'>";
         echo "</form>";
     }
@@ -110,7 +110,10 @@
     }
 
     // Log out link
-    echo "<a href='logout.php'>Log Out</a>";
+    echo "<a href='logout.php'>Log Out</a><br>";
+
+    // Home link
+    echo "<a href='index.php'>Home</a>";
     ?>
 </body>
 </html>
