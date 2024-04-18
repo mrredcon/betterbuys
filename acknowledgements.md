@@ -1,4 +1,4 @@
-# Acknowledgesments
+# Acknowledgements
 
 ## InfoChimps English Word List
 Original source:
