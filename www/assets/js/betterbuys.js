@@ -4,6 +4,23 @@ let sortBy = 'name';
 let direction = 'asc';
 let pageNum = 1;
 
+function showControls() {
+	$("#btnSortPrice").show();
+	$("#btnSortName").show();
+}
+
+function hideControls() {
+	$("#btnSortPrice").hide();
+	$("#btnSortName").hide();
+}
+
+function noProductsFound() {
+	$("#productcontainer").html('<h1>No products found.</h1>');
+	$("#paginatorcontainer1").html('');
+	$("#paginatorcontainer2").html('');
+	hideControls();
+}
+
 function changeToPage(newPageNum) {
 	if (pageNum == newPageNum) {
 		return;
@@ -13,6 +30,7 @@ function changeToPage(newPageNum) {
 
 	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
 		.done(function(data, textStatus, jqXHR) {
+			showControls();
 			response = data;
 			if (sortBy === 'name') {
 				sortName(direction);
@@ -23,7 +41,7 @@ function changeToPage(newPageNum) {
 			drawPaginator();
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			$("#productcontainer").html('<h1>No products found.</h1>');
+			noProductsFound();
 		});
 }
 
@@ -168,22 +186,23 @@ btnSortName.addEventListener("click", () => {
 
 	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
 		.done(function(data, textStatus, jqXHR) {
+			showControls();
 			response = data;
 			sortName(btnSortName.value);
 			drawPaginator();
 
 			if (btnSortName.value === "asc") {
 				btnSortName.innerHTML = 'Sort by name <i class="icon-sort-by-alphabet"></i>';
-				btnSortPrice.innerHTML = "Sort by price";
 				btnSortName.value = "desc";
 			} else if (btnSortName.value === "desc") {
 				btnSortName.innerHTML = 'Sort by name <i class="icon-sort-by-alphabet-alt"></i>';
-				btnSortPrice.innerHTML = "Sort by price";
 				btnSortName.value = "asc";
 			}
+
+			btnSortPrice.innerHTML = "Sort by price";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			$("#productcontainer").html('<h1>No products found.</h1>');
+			noProductsFound();
 		});
 });
 
@@ -194,6 +213,7 @@ btnSortPrice.addEventListener("click", () => {
 
 	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
 		.done(function(data, textStatus, jqXHR) {
+			showControls();
 			response = data;
 			sortPrice(direction)
 
@@ -201,16 +221,16 @@ btnSortPrice.addEventListener("click", () => {
 
 			if (btnSortPrice.value === "asc") {
 				btnSortPrice.innerHTML = 'Sort by price <i class="icon-sort-by-order"></i>';
-				btnSortName.innerHTML = "Sort by name";
 				btnSortPrice.value = "desc";
 			} else if (btnSortPrice.value === "desc") {
 				btnSortPrice.innerHTML = 'Sort by price <i class="icon-sort-by-order-alt"></i>';
-				btnSortName.innerHTML = "Sort by name";
 				btnSortPrice.value = "asc";
 			}
+
+			btnSortName.innerHTML = "Sort by name";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			$("#productcontainer").html('<h1>No products found.</h1>');
+			noProductsFound();
 		});
 });
 
@@ -221,6 +241,7 @@ $("#formSearch").submit(function(e){
 
 	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
 		.done(function(data, textStatus, jqXHR) {
+			showControls();
 			response = data;
 			if (sortBy === 'name') {
 				sortName(direction);
@@ -231,8 +252,48 @@ $("#formSearch").submit(function(e){
 			drawPaginator();
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			$("#productcontainer").html('<h1>No products found.</h1>');
+			noProductsFound();
 		});
+});
+
+function resetView() {
+	response = null;
+	query = '';
+	sortBy = 'name';
+	direction = 'asc';
+	pageNum = 1;
+	$("#inputSearch").val('');
+
+	$.getJSON('/products.php')
+		.done(function(data, textStatus, jqXHR) {
+			showControls();
+			response = data;
+
+			const btnSortPrice = document.querySelector("#btnSortPrice");
+			btnSortPrice.innerHTML = "Sort by price";
+			btnSortPrice.value = "asc";
+
+			const btnSortName = document.querySelector("#btnSortName");
+			btnSortName.innerHTML = "Sort by name";
+			btnSortName.value = "asc";
+
+			sortName("asc");
+			drawPaginator();
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			alert('Get failed! Error: ' + jqXHR.status + ' ' + errorThrown);
+		});
+}
+
+const btnLogo = document.querySelector("#btnLogo");
+btnLogo.addEventListener("click", () => {
+	resetView();
+});
+
+
+const btnHome = document.querySelector("#btnHome");
+btnHome.addEventListener("click", () => {
+	resetView();
 });
 
 $.getJSON('/products.php')
