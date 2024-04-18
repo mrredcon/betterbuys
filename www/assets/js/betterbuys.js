@@ -1,10 +1,57 @@
-let products = null;
+let response = null;
 let sortBy = 'name';
 let direction = 'asc';
 
-function drawProducts(products) {
+function drawPaginator() {
+	const BUTTONS = 3;
+	const current = response.currentPage;
+	const pages = Math.floor(response.total / response.entriesPerPage) + 1;
+
+	let pageHtml = '';
+	pageHtml += `
+		<li class="page-item">
+			<a class="page-link" href="#" aria-label="Previous">
+				<span aria-hidden="true">&laquo;</span>
+			</a>
+		</li>`;
+
+	for (let i = 1; i <= BUTTONS; i++) {
+		const label = current + i - 1;
+
+		if (i == BUTTONS && pages > BUTTONS) {
+			pageHtml += `<li class="page-item"><a class="page-link" href="#">${pages}</a></li>`;
+		} else if (label == current) {
+			pageHtml += `<li class="page-item active"><a class="page-link" href="#">${label}</a></li>`;
+		} else if (i < BUTTONS) {
+			pageHtml += `<li class="page-item"><a class="page-link" href="#">${label}</a></li>`;
+		}
+
+		if (i == pages) {
+			break;
+		}
+
+		if (i == (BUTTONS - 1) && pages > BUTTONS) {
+			pageHtml += `
+				<li class="page-item">
+					<span class="page-link">...</span>
+				</li>`;
+		}
+	}
+
+
+	pageHtml += `
+		<li class="page-item">
+			<a class="page-link" href="#" aria-label="Next">
+				<span aria-hidden="true">&raquo;</span>
+			</a>
+		</li>`;
+
+	$("#paginatorcontainer").html(pageHtml);
+}
+
+function drawProducts() {
 	let cardHtml = '';
-	for (const product of products) {
+	for (const product of response.data) {
 		cardHtml += `
 		<div class="col-6 col-lg-3 mb-3 ps-0">
 			<div class="card" style="height: 28rem;">
@@ -29,21 +76,21 @@ function drawProducts(products) {
 
 function sortPrice(direction) {
 	if (direction === "asc") {
-		products.sort((a, b) => {
+		response.data.sort((a, b) => {
 			return parseFloat(a.price) - parseFloat(b.price);
 		});
 	} else if (direction === "dsc") {
-		products.sort((a, b) => {
+		response.data.sort((a, b) => {
 			return parseFloat(b.price) - parseFloat(a.price);
 		});
 	}
 
-	drawProducts(products);
+	drawProducts();
 }
 
 function sortName(direction) {
 	if (direction === "asc") {
-		products.sort((a, b) => {
+		response.data.sort((a, b) => {
 			let aName = a.name.toLowerCase();
 			let bName = b.name.toLowerCase();
 
@@ -58,7 +105,7 @@ function sortName(direction) {
 			return 0;
 		});
 	} else if (direction === "dsc") {
-		products.sort((a, b) => {
+		response.data.sort((a, b) => {
 			let aName = a.name.toLowerCase();
 			let bName = b.name.toLowerCase();
 
@@ -74,7 +121,7 @@ function sortName(direction) {
 		});
 	}
 
-	drawProducts(products);
+	drawProducts();
 }
 
 const btnSortName = document.querySelector("#btnSortName");
@@ -118,18 +165,20 @@ $("#formSearch").submit(function(e){
 
 	$.getJSON('/products.php?query=' + query)
 		.done(function(data, textStatus, jqXHR) {
-			products = data.data;
-			sortName("asc", products);
+			response = data;
+			sortName("asc");
+			drawPaginator();
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			alert('Get failed! Error: ' + jqXHR.status + ' ' + errorThrown);
+			$("#productcontainer").html('<h1>No products found.</h1>');
 		});
 });
 
 $.getJSON('/products.php')
 	.done(function(data, textStatus, jqXHR) {
-		products = data.data;
-		sortName("asc", products);
+		response = data;
+		sortName("asc");
+		drawPaginator();
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		alert('Get failed! Error: ' + jqXHR.status + ' ' + errorThrown);

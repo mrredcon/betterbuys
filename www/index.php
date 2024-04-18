@@ -76,12 +76,21 @@
 	</nav>
 
 	<div class="container text-center my-3">
-		<div class="row mb-3">
+		<div class="row mx-3">
 			<button type="button" class="btn btn-primary w-auto me-3" id="btnSortPrice" value="asc">Sort by price</button>
 			<button type="button" class="btn btn-primary w-auto me-3" id="btnSortName" value="asc">Sort by name</button>
 		</div>
 
-		<div id="productcontainer" class="row"></div>
+		<br>
+
+		<div id="productcontainer" class="row mx-3"></div>
+
+		<div  class="row mx-3">
+			<nav aria-label="Page navigation example" class="ps-0">
+				<ul class="pagination" id="paginatorcontainer">
+				</ul>
+			</nav>
+		</div>
 	</div>
 	<script src="assets/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/js/jquery-3.7.1.js"></script>

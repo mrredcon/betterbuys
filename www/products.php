@@ -1,7 +1,7 @@
 <?php
 $RESULTS_PER_PAGE = 20;
-$page = filter_input(INPUT_GET, 'page', FILTER_DEFAULT, array("options" => array("default" => 0)));
-$offset = $page * $RESULTS_PER_PAGE;
+$page = filter_input(INPUT_GET, 'page', FILTER_DEFAULT, array("options" => array("default" => 1)));
+$offset = ($page - 1) * $RESULTS_PER_PAGE;
 
 $search_terms = filter_input(INPUT_GET, 'query', FILTER_DEFAULT, array("options" => array("default" => '')));
 
@@ -21,6 +21,21 @@ if (strcmp($direction, "asc") != 0 && strcmp($direction, "desc") != 0) {
 
 $pdo = require_once 'connect.php';
 
+
+// Get total count
+$sql = 'SELECT COUNT(id) FROM Product
+	WHERE name LIKE CONCAT("%", :search_terms1, "%") OR description LIKE CONCAT("%", :search_terms2, "%")';
+
+$statement = $pdo->prepare($sql);
+
+$statement->execute([
+	':search_terms1' => $search_terms,
+	':search_terms2' => $search_terms,
+]);
+
+$count = $statement->fetchColumn();
+
+// Retrieve matching products and their primary image but also limit the amount of results
 $sql = 'SELECT a.id, a.name, a.description, a.price, b.filepath AS imagePath
 	FROM Product a LEFT JOIN ProductImage b ON a.id = b.productId AND b.priority = 0
 	WHERE a.name LIKE CONCAT("%", :search_terms1, "%") OR a.description LIKE CONCAT("%", :search_terms2, "%")
@@ -40,7 +55,6 @@ $products = $statement->fetchAll(PDO::FETCH_ASSOC);
 if ($products) {
 	// we found products
 	header('Content-Type: application/json; charset=utf-8');
-	$count = sizeof($products);
 
 	echo json_encode(array(
 		"entriesPerPage" => $RESULTS_PER_PAGE,
