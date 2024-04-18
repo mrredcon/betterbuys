@@ -35,6 +35,39 @@
 		':shippingFee' => 5.00,
 		':fulfilled' => 0
 	]);
+	
+	$transaction_id = $pdo->lastInsertId();
+	
+	$product_array = json_decode($_COOKIE['shoppingCart'], true);
+	
+	foreach($product_array as $key => $value){
+		$sql = 'INSERT INTO TransactionItem (transactionId, productId, quantity) VALUES(:transactionId, :productId, :quantity)';
+	
+		$statement = $pdo->prepare($sql);
+	
+		$statement->execute([
+			':transactionId' => $transaction_id,
+			':productId' => $key,
+			':quantity' => $value
+		]);
+		
+		$sql = 'SELECT quantity FROM Product WHERE id=' . $key;
+		
+		$statement = $pdo->query($sql);
+		
+		$qProduct = $statement->fetch(PDO::FETCH_ASSOC);
+		
+		$newQuantity = $qProduct['quantity'] - $value;
+		
+		$sql = 'UPDATE Product SET quantity = :quantity WHERE id=:id';
+		
+		$statement = $pdo->prepare($sql);
+		
+		$statement->execute([
+			':quantity' => $newQuantity,
+			':id' => $key
+		]);
+	}
 ?>
 <!DOCTYPE html>
 <html>
