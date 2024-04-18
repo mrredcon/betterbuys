@@ -76,19 +76,26 @@
 	</nav>
 
 	<div class="container text-center my-3">
-		<div class="row mx-3">
-			<button type="button" class="btn btn-primary w-auto me-3" id="btnSortPrice" value="asc">Sort by price</button>
-			<button type="button" class="btn btn-primary w-auto me-3" id="btnSortName" value="asc">Sort by name</button>
+		<div class="row mx-3 justify-content-between">
+			<div class="col-auto">
+				<nav aria-label="Page navigation" class="ps-0" style="width: fit-content;">
+					<ul class="pagination" id="paginatorcontainer1"></ul>
+				</nav>
+			</div>
+
+			<div class="col-auto">
+				<button type="button" class="btn btn-primary me-3" id="btnSortPrice" value="asc">Sort by price</button>
+				<button type="button" class="btn btn-primary me-3" id="btnSortName" value="asc">Sort by name</button>
+			</div>
 		</div>
 
 		<br>
 
 		<div id="productcontainer" class="row mx-3"></div>
 
-		<div  class="row mx-3">
-			<nav aria-label="Page navigation example" class="ps-0">
-				<ul class="pagination" id="paginatorcontainer">
-				</ul>
+		<div class="row mx-3">
+			<nav aria-label="Page navigation" class="ps-0" style="width: fit-content;">
+				<ul class="pagination" id="paginatorcontainer2"></ul>
 			</nav>
 		</div>
 	</div>

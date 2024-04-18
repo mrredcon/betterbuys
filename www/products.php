@@ -57,9 +57,9 @@ if ($products) {
 	header('Content-Type: application/json; charset=utf-8');
 
 	echo json_encode(array(
-		"entriesPerPage" => $RESULTS_PER_PAGE,
-		"currentPage" => $page,
-		"total" => $count,
+		"entriesPerPage" => (int)$RESULTS_PER_PAGE,
+		"currentPage" => (int)$page,
+		"total" => (int)$count,
 		"data" => $products
 	));
 } else {
