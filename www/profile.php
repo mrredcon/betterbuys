@@ -55,6 +55,50 @@
     echo "Phone Number: " . $user['e164PhoneNumber'] . "<br>";
     echo "Money: $" . $user['money'] . "<br>";
 
+    // Display previous purchases
+    echo "<h3>Previous Purchases</h3>";
+    // Fetch user's previous purchases from the Transaction table
+    $sql = 'SELECT productId, purchaseDate, quantity, subtotal, shippingFee FROM Transaction WHERE userId=:user_id';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':user_id', $user_to_show, PDO::PARAM_INT);
+    $stmt->execute();
+    $purchases = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if(count($purchases) > 0) {
+        echo "<table border='1'>";
+        echo "<tr><th>Product</th><th>Date</th><th>Quantity</th><th>Subtotal</th><th>Shipping Fee</th></tr>";
+        foreach($purchases as $purchase) {
+            // Fetch product information for each purchase
+            $product_id = $purchase['productId'];
+            $product_sql = 'SELECT name FROM Product WHERE id=:product_id';
+            $product_stmt = $pdo->prepare($product_sql);
+            $product_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+            $product_stmt->execute();
+            $product = $product_stmt->fetch(PDO::FETCH_ASSOC);
+
+	    echo "<tr>";
+            echo "<td>" . $product['name'] . "</td>";
+            echo "<td>" . $purchase['purchaseDate'] . "</td>";
+            echo "<td>" . $purchase['quantity'] . "</td>";
+            echo "<td>$" . $purchase['subtotal'] . "</td>";
+            echo "<td>$" . $purchase['shippingFee'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No previous purchases found.";
+    }
+
+    // Allow user to add credit to their account
+    if ($is_admin || $_SESSION['user_id'] == $user_to_show) {
+        echo "<h3>Add Credit</h3>";
+        echo "<form method='post' action='add_credit.php'>";
+        echo "<input type='hidden' name='user_id' value='$user_to_show'>";
+        echo "Amount: <input type='number' step='0.01' name='amount' required><br><br>";
+        echo "<input type='submit' value='Add Credit'>";
+        echo "</form>";
+    }
+
     // Allow user to edit their profile
     if ($is_admin || $_SESSION['user_id'] == $user_to_show) {
      echo "<a href='edit_profile.php?user_id=$user_to_show'>Edit Profile</a><br>";
@@ -66,7 +110,10 @@
     }
 
     // Log out link
-    echo "<a href='logout.php'>Log Out</a>";
+    echo "<a href='logout.php'>Log Out</a><br>";
+
+    // Home link
+    echo "<a href='index.php'>Home</a>";
     ?>
 </body>
 </html>

@@ -12,6 +12,7 @@ services:
             - './www:/var/www/html'
             - './new_user_email.html:/new_user_email.html:ro'
             - 'images:/images'
+            - './config/php/php.ini-development:/usr/local/etc/php/php.ini:ro'
         depends_on:
             - mysql
         environment:

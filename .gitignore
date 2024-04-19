@@ -3,3 +3,6 @@
 
 # Better Buys configuration file
 bb_config.ini
+
+# Mac .DS_Store file
+.DS_Store

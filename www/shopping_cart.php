@@ -2,6 +2,12 @@
 	session_start();
 	$pdo = require 'connect.php';
 	
+	if(isset($_COOKIE['shoppingCart']) && sizeof(json_decode($_COOKIE['shoppingCart'], true)) === 0){
+		setcookie('shoppingCart', 0, time() - 3600, '/');
+		header("Refresh:0");
+		exit;
+	}
+	
 	$discountType = 0.0;
 	$discountAmount = NULL;
 	$dCode = NULL;
@@ -62,6 +68,7 @@
 					setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
 				}			
 				header("Refresh:0");
+				exit;
 			}
 		
 		}
@@ -80,6 +87,7 @@
 			}
 			setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
 			header("Refresh:0");
+			exit;
 		}
 	
 	}
@@ -182,6 +190,10 @@
 			
 			if(!isset($_SESSION['user_id'])){
     		    echo 'Please login to place an order';
+				exit;
+    		}
+			if($_SESSION['user_id'] == 0){
+    		    echo 'Main admin cannot place orders';
 				exit;
     		}
 		?>
