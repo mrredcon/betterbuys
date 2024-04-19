@@ -36,10 +36,13 @@ $statement->execute([
 $count = $statement->fetchColumn();
 
 // Retrieve matching products and their primary image but also limit the amount of results
-$sql = 'SELECT a.id, a.name, a.description, a.price, b.filepath AS imagePath
-	FROM Product a LEFT JOIN ProductImage b ON a.id = b.productId AND b.priority = 0
-	WHERE a.name LIKE CONCAT("%", :search_terms1, "%") OR a.description LIKE CONCAT("%", :search_terms2, "%")
-	ORDER BY a.' . $sort_by . ' ' . $direction . '
+// TODO: When a store selector is implemented, add a parameter to "inv.storeId = X"
+$sql = 'SELECT p.id, p.name, p.description, p.price, p.discount, img.filepath AS imagePath, IFNULL(inv.quantity, 0) AS quantity
+	FROM Product p
+	LEFT JOIN ProductImage img ON p.id = img.productId AND img.priority = 0
+	LEFT JOIN Inventory inv ON p.id = inv.productId AND inv.storeId = 1
+	WHERE p.name LIKE CONCAT("%", :search_terms1, "%") OR p.description LIKE CONCAT("%", :search_terms2, "%")
+	ORDER BY p.' . $sort_by . ' ' . $direction . '
 	LIMIT ' . $offset . ', ' . $RESULTS_PER_PAGE;
 
 $statement = $pdo->prepare($sql);

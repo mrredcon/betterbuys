@@ -109,18 +109,37 @@ function drawProducts() {
 	for (const product of response.data) {
 		cardHtml += `
 		<div class="col-6 col-lg-3 mb-3 ps-0">
-			<div class="card" style="height: 28rem;">
+			<div class="card" style="height: 34rem;">
 				<img class="card-img-top object-fit-contain mb-auto" style="height: 60%;" src="${product.imagePath}">
 				<div class="card-body d-flex flex-column align-items-center" style="height: 40%;">
 					<p class="card-text flex-grow-1" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp:2; line-clamp: 2; -webkit-box-orient: vertical;">${product.name}</p>
-		  			<br>
-		          		<p class="card-text">\$${product.price}</p>
-		  			<br>
+		  			<br>`
+
+					if (product.discount === null) {
+						cardHtml += `<p class="card-text">\$${product.price}</p>`
+					} else {
+						cardHtml += `<p class="card-text"><s>\$${product.price}</s><br><b class="text-primary">SALE! \$${parseFloat(product.price) - parseFloat(product.discount)}</b></p>`
+					}
+
+					cardHtml += `<br>`;
+					
+					if (product.quantity === 0) {
+						cardHtml += `
+		          			<p class="card-text text-danger">Out of stock</p>
+		  				<br>`;
+					} else {
+						cardHtml += `
+		          			<p class="card-text">Quantity in stock: ${product.quantity}</p>
+		  				<br>
 		
-		  			<form method="post" action="shopping_cart.php">
-		  				<input type="hidden" name="product_id" value="${product.id}">
-		  				<input class="btn btn-primary px-2" type="submit" value="Add to Cart">
-		  			</form>
+		  				<form method="post" action="shopping_cart.php">
+		  					<input type="hidden" name="product_id" value="${product.id}">
+		  					<input class="btn btn-primary px-2" type="submit" value="Add to Cart">
+		  				</form>`;
+
+					}
+
+					cardHtml += `
 				</div>
 			</div>
 		</div>`;
