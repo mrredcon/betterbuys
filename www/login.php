@@ -62,19 +62,63 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <title>Login to your Better Buys account</title>
+    <style>
+	html,
+	body {
+	  height: 100%;
+	}
+	
+	.form-signin {
+	  max-width: 330px;
+	  padding: 1rem;
+	}
+	
+	.form-signin .form-floating:focus-within {
+	  z-index: 2;
+	}
+	
+	.form-signin input[type="email"] {
+	  margin-bottom: -1px;
+	  border-bottom-right-radius: 0;
+	  border-bottom-left-radius: 0;
+	}
+	
+	.form-signin input[type="password"] {
+	  margin-bottom: 10px;
+	  border-top-left-radius: 0;
+	  border-top-right-radius: 0;
+	}
+    </style>
 </head>
-<body>
-    <h2>Login</h2>
-    <?php if(isset($error)) { ?>
-        <p><?php echo $error; ?></p>
-    <?php } ?>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <label>Email:</label><br>
-        <input type="text" name="email" required><br><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <input type="submit" value="Login">
-    </form>
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+	<main class="form-signin w-100 m-auto">
+		<form method="post">
+			<h1 class="h3 mb-3 fw-normal">Better Buys</h1>
+
+			<div class="form-floating">
+				<input type="text" class="form-control" id="floatingInput" name="email" placeholder="name@example.com" required>
+				<label for="floatingInput">Email address</label>
+			</div>
+
+			<div class="form-floating">
+				<input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
+				<label for="floatingPassword">Password</label>
+			</div>
+
+    			<?php if(isset($error)) { ?>
+    			    <p class="mt-3 mb-3 text-danger"><?php echo $error; ?></p>
+    			<?php } ?>
+
+			<button class="btn btn-primary w-100 py-2" type="submit" value="Login">Sign in</button>
+			<p class="mt-5 mb-3 text-body-secondary">&copy; 2024 UTSA CS 3773</p>
+		</form>
+	</main>
+
+	<script src="assets/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
