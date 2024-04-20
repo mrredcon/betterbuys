@@ -14,15 +14,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $last_name = $_POST['last_name'];
     $address = $_POST['address'];
     $phone_number = $_POST['phone_number'];
+    $money = $_POST['money'];
+
+    // Validate money amount
+    if($money < 0) {
+        echo "Money amount must be positive.";
+        exit();
+    }
 
     // Update user's profile info in the database
     $pdo = require_once 'connect.php';
-    $sql = 'UPDATE User SET firstName=:first_name, lastName=:last_name, physicalAddress=:address, e164PhoneNumber=:phone_number WHERE id=:user_id';
+    $sql = 'UPDATE User SET firstName=:first_name, lastName=:last_name, physicalAddress=:address, e164PhoneNumber=:phone_number, money=:money WHERE id=:user_id';
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':first_name', $first_name, PDO::PARAM_STR);
     $stmt->bindParam(':last_name', $last_name, PDO::PARAM_STR);
     $stmt->bindParam(':address', $address, PDO::PARAM_STR);
     $stmt->bindParam(':phone_number', $phone_number, PDO::PARAM_STR);
+    $stmt->bindParam(':money', $money, PDO::PARAM_STR);
     $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->execute();
 
@@ -33,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Fetch user's profile info from the database
 $pdo = require_once 'connect.php';
-$sql = 'SELECT firstName, lastName, physicalAddress, e164PhoneNumber FROM User WHERE id=:user_id';
+$sql = 'SELECT firstName, lastName, physicalAddress, e164PhoneNumber, money FROM User WHERE id=:user_id';
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
@@ -59,6 +67,7 @@ if(!$user){
         Last Name: <input type="text" name="last_name" value="<?php echo $user['lastName']; ?>"><br><br>
         Address: <input type="text" name="address" value="<?php echo $user['physicalAddress']; ?>"><br><br>
         Phone Number: <input type="text" name="phone_number" value="<?php echo $user['e164PhoneNumber']; ?>"><br><br>
+        Money: <input type="number" step="0.01" name="money" value="<?php echo $user['money']; ?>"><br><br> <!-- New field for money amount -->
         <input type="submit" value="Save">
     </form>
     <br>
