@@ -10,14 +10,15 @@
 	<?php
 		$pdo = require_once 'connect.php';
 
-		/* ** Uncomment to temporarily seed database with a single record if this is your first time executing this page.
+		/* 
+		** Uncomment to temporarily seed database with a single record if this is your first time executing this page.
 		   
 		** Some variables are hardcoded for the sake of displaying data until homepage data can be retrieved.
 		
 		$pdo->exec("INSERT INTO ProductImage VALUES ( 1, 'images\gudetama.jpg', 1, 0);");
 		echo "ProductImage created successfully.";
 
-		$pdo->exec("INSERT INTO Store VALUES ( 2, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Best Buy Rim', 0);");
+		$pdo->exec("INSERT INTO Store VALUES ( 1, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Best Buy Rim', 0);");
 		echo "Store created successfully.";
 		
 		$pdo->exec("INSERT INTO Inventory VALUES ( 1, 1, 10);");
@@ -37,7 +38,7 @@
 		$product_name = $product['name'];
 		$product_description = $product['description'];
 		$product_price = $product['price'];
-		$product_discount = '10'; //$product['discount'];
+		$product_discount = $product['discount'];
 		$product_image = $product['filepath'];
 		$product_priority = $product['priority'];
 		$product_quantity = '';
@@ -49,18 +50,21 @@
 	
 		$store = $statement->fetch(PDO::FETCH_ASSOC);
 		
-		$store_name = 'storename';//$store['name'];
-		$store_pickup = '0';//$store['onlineOnly'];
-		$store_inventory = '10';//$store['quantity'];
-		$nearest_store = '1';
+		$store_name = $store['name'];
+		$store_pickup = $store['onlineOnly'];
+		$store_inventory = $store['quantity'];
 
-		// Check and set discount
+		// TEMP: Check and set discount
 		if ($product_discount) {
-			$discount_type = 'flat';
+			$discount_type = 'percentage';
 		}
 
 		# Begin display
 		echo '<h1>' . $product_name . '</h1>';
+
+		echo '<div class="row">';
+		echo '<h2>SALE: ' . $product_discount . ' off!</h2>';
+		echo '</div>';
 
 		# In stock?
 		if ($store_inventory < 1) {
@@ -80,8 +84,7 @@
         # TODO: Add carousel functionality if there are multiple images
         # Note: Single image should have priority 0 default; Other, display image 0
 		//foreach ($product_image as $image) {
-			echo '<tr>';
-				echo '<td><img src="' . $product_image . '"</td>';
+			echo '<td><img src="' . $product_image . '"</td>';
 		//}
 	?>
 	</div> <!--Product Image end-->
@@ -90,58 +93,60 @@
 
 	<div> <!--Product Description start-->
 		<?php
-			echo '<table>';
-				// Discount?
+				// Sale?
 				if ($product_discount && $product_price >= $product_discount) {
-					 //Change for when discount is provided
 					if ($discount_type == 'percentage') {
 						$discount_price = $product_price * $product_discount;
-						echo '<td><h2>'	. $discount_price . '</h2></td>';
-						echo '<tr>';
-							echo '<td> Originally <s>' . $product_price . '</s></td>';
-						echo '</tr>';
+						echo '<div class="row">';
+						echo '<div class="col-sm-6">';
+							echo '<h2>'	. $discount_price . '</h2>';
+						echo '</div>';
+						
+						echo '<div class="col-sm-6">';
+							echo 'Originally <s>' . $product_price . '</s>';
+						echo '</div>';
+						echo '</div>';
 					}
 					else if ($discount_type == 'flat') {
 						$discount_price = $product_price - $product_discount;
-						echo '<td><h2>'	. $discount_price . '</h2></td>';
-						echo '<tr>';
-							echo '<td> Originally <s>' . $product_price . '</s></td>';
-						echo '</tr>';
+						echo '<div class="row">';
+							echo '<h2>'	. $discount_price . '</h2>';
+						echo '</div>';
+						echo '<div class="row">';
+							echo 'Originally <s>' . $product_price . '</s>';
+						echo '</div>';
 					}
 				}
 				else {
-					echo '<td><h2>$' . $product_price . '</h2></td>';
+					echo '<div class="row">';
+						echo '<b>$' . $product_price . '</b>';
+					echo '</div">';
 				}
-				echo '<tr>';
-					echo '<th>Item Description</th>';
-				echo '</tr>';
 				echo '<div class="row">';
-					echo '<div class="col-sm-6>' . $product_description . '</td>';
+					echo 'Item Description';
 				echo '</div>';
-			echo '</table>';
+				echo '<div class="row">';
+					echo '<div class="col-sm-6>' . $product_description . '</div>';
+				echo '</div>';
 		?>
 	</div> <!--Product Description end-->
 	
     <section> <!--Availability Selection start-->
         <div>
 			<h3>Availability</h3>
-            <?php 
-                if(!isset($_POST['submit'])) {
-					// Set selected product quantity
-					$product_quantity = isset($_POST['amount']) ? $_POST['amount'] : '';
-            ?>
-
-            <form method="post" action="shopping_cart.php" id="availability-form" onsubmit="return validateForm(<?php echo $store_inventory; ?>)">
 			
-						
-				<div class="row">
+            <?php 
+            if(!isset($_POST['submit'])) {
+				// Set selected product quantity
+				$product_quantity = isset($_POST['amount']) ? $_POST['amount'] : '';
+            ?>					
+				<form method="post" action="shopping_cart.php" id="availability-form" >	
 
-				</div>
-                    <!--Delivery Option start-->
+				<!--Delivery Option start-->
 				<div class="row">
                     <div class="col-sm-6"> 
                         <div class="form-group" id="delivery">
-                            <input type="radio" name="availability" value="delivery" id="delivery">
+                            <input type="radio" name="availability" value="delivery" id="delivery" required>
                             <label for="delivery">Delivery</label>
                         </div>
                     </div>
@@ -173,39 +178,34 @@
 						echo '</table>';
 					?>
 				</div>
-
-				<div>
-					<label for="amount">Enter an amount</label>
-					<input type="text" id="amount" name="amount">
-				</div>
+				
 				<!--Validate amount inputted-->
 				<script>
 					function validateForm(max) {
 						var numberInput = document.getElementById("amount").value;
 						var number = parseInt(numberInput);
-
-						if (isNaN(number)) {
-							alert('Please enter an integer number for desired amount.');
-							return false;
-						} 
-						else if (number < 0) {
-							alert('Cannot enter a negative number.'); 
-							return false;
-						}
-						else if (number > max) {
+						
+						if (number > max) {
 							alert('Please enter an amount less than or equal to available stock.');
 							return false;
 						}
+						
 						return true;
 					}
 				</script>
 				<!--End validation-->
+
+				<div>
+					<label for="amount">Enter an amount: </label>
+					<input type="number" id="amount" name="amount" min="0" required>
+				</div>
 				
 				<?php
+
 					echo '<div class="row">';
 						echo '<div class="col-sm-6">';
-							echo '<input type="hidden" name="product_id" value="' . $product['id'] . '">';
-							echo '<input type="submit" name="submit" value="Add to cart">';		
+						echo '<input type="hidden" name="product_id" value="' . $product['id'] . '">';
+						echo '<button name="submit" onclick="return validateForm(' . $store_inventory . ')">Add to Cart</button>';
 						echo '</div>';
 					echo '</div>';
 				echo '</form>';
