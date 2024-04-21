@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -14,9 +15,6 @@
 		** Uncomment to temporarily seed database with a single record if this is your first time executing this page.
 		   
 		** Some variables are hardcoded for the sake of displaying data until homepage data can be retrieved.
-		
-		$pdo->exec("INSERT INTO ProductImage VALUES ( 1, 'images\gudetama.jpg', 1, 0);");
-		echo "ProductImage created successfully.";
 
 		$pdo->exec("INSERT INTO Store VALUES ( 1, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Best Buy Rim', 0);");
 		echo "Store created successfully.";
@@ -65,7 +63,7 @@
 		echo '<div class="row">';
 		echo '<h2>SALE: ' . $product_discount . ' off!</h2>';
 		echo '</div>';
-
+		
 		# In stock?
 		if ($store_inventory < 1) {
 			echo '<h3>Not in stock</h3>';
@@ -99,21 +97,21 @@
 						$discount_price = $product_price * $product_discount;
 						echo '<div class="row">';
 						echo '<div class="col-sm-6">';
-							echo '<h2>'	. $discount_price . '</h2>';
+							echo '<h2>$'	. $discount_price . '</h2>';
 						echo '</div>';
 						
 						echo '<div class="col-sm-6">';
-							echo 'Originally <s>' . $product_price . '</s>';
+							echo 'Originally <s>$' . $product_price . '</s>';
 						echo '</div>';
 						echo '</div>';
 					}
 					else if ($discount_type == 'flat') {
 						$discount_price = $product_price - $product_discount;
 						echo '<div class="row">';
-							echo '<h2>'	. $discount_price . '</h2>';
+							echo '<h2>$' . $discount_price . '</h2>';
 						echo '</div>';
 						echo '<div class="row">';
-							echo 'Originally <s>' . $product_price . '</s>';
+							echo 'Originally <s>$' . $product_price . '</s>';
 						echo '</div>';
 					}
 				}
@@ -126,7 +124,7 @@
 					echo 'Item Description';
 				echo '</div>';
 				echo '<div class="row">';
-					echo '<div class="col-sm-6>' . $product_description . '</div>';
+					echo '<div class="col-sm-6">' . $product_description . '</div>';
 				echo '</div>';
 		?>
 	</div> <!--Product Description end-->
@@ -134,42 +132,32 @@
     <section> <!--Availability Selection start-->
         <div>
 			<h3>Availability</h3>
-			
-            <?php 
-            if(!isset($_POST['submit'])) {
-				// Set selected product quantity
-				$product_quantity = isset($_POST['amount']) ? $_POST['amount'] : '';
-            ?>					
-				<form method="post" action="shopping_cart.php" id="availability-form" >	
+						
+			<form method="post" action="shopping_cart.php" id="availability-form">	
 
 				<!--Delivery Option start-->
 				<div class="row">
-                    <div class="col-sm-6"> 
-                        <div class="form-group" id="delivery">
-                            <input type="radio" name="availability" value="delivery" id="delivery" required>
-                            <label for="delivery">Delivery</label>
-                        </div>
-                    </div>
+					<div class="form-group" id="delivery">
+						<input type="radio" name="availability" value="delivery" id="delivery" required>
+						<label for="delivery">Delivery</label>
+					</div>
                     <!--Delivery Option end-->
 
 					<?php
 						// Check if pickup option is available
 						if ($store_pickup == 0) {
+							// Pick Up Option start
+							echo '<div class="form-group" id="pickup">';
+								echo '<input type="radio" name="availability" value="pickup" id="pickup">';
+								echo '<label for="pickup">Pick Up</label>';
+							echo '</div>';
+							// Pick Up Option end
+						}
 					?>
-
-                    <!--Pick Up Option start-->
-                    <div class="col-sm-6">
-                        <div class="form-group" id="pickup">
-                            <input type="radio" name="availability" value="pickup" id="pickup">
-                            <label for="pickup">Pick Up</label>
-                        </div>
-                    </div>
-                    <!--Pick Up Option end-->
                 </div>
 
 				<div>
 					<?php
-						}
 						echo '<table>';
 							echo '<th>' . $store_name . '</th>';
 							echo '<tr>';
@@ -189,33 +177,37 @@
 							alert('Please enter an amount less than or equal to available stock.');
 							return false;
 						}
-						
-						return true;
+						else {
+							document.getElementById("availability-form").submit();
+							alert('Successfully added to shopping cart!');
+							return true;
+						}
 					}
 				</script>
 				<!--End validation-->
 
-				<div>
+				<!--Enter desired amount-->
+				<div class="form-group">
 					<label for="amount">Enter an amount: </label>
 					<input type="number" id="amount" name="amount" min="0" required>
 				</div>
-				
-				<?php
+				<!--Enter amount end-->
 
+				<?php 
+				// Set selected product quantity
+				$product_quantity = isset($_POST['amount']) ? $_POST['amount'] : '';
+            
 					echo '<div class="row">';
-						echo '<div class="col-sm-6">';
+						echo '<div class="form-group">';
 						echo '<input type="hidden" name="product_id" value="' . $product['id'] . '">';
-						echo '<button name="submit" onclick="return validateForm(' . $store_inventory . ')">Add to Cart</button>';
+						echo '<input type="submit" value="Add to cart" onclick="return validateForm(' . $store_inventory . ');">';
 						echo '</div>';
 					echo '</div>';
 				echo '</form>';
 				}
-
-                else {
-                    echo $product_quantity . ' ' . $product_name . ' successfully added to shopping cart!';
-				}
-			}
             ?>
+
+		</div>
     </section> <!--Availability Selection end-->
 </body>
 </html>
