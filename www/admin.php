@@ -1,492 +1,173 @@
+<!-- CONTENT SECTION -->	
 <?php
-	session_start();
-	ob_start();
+	$page = 'products';
+	if (isset($_GET['page'])) {
+	        $page = $_GET['page'];
+	}
 
-	
+	$main_body = '';
+
+	switch($page) {
+		case 'product_edit':
+			$main_body = include 'product_edit.php';
+			break;
+	        case 'stores':
+	                $main_body = include 'admin/stores.php';
+	                break;
+		case 'store_edit':
+			$main_body = include 'store_edit.php';
+			break;
+	        case 'inventory':
+	                $main_body = include 'admin/inventory.php';
+	                break;
+	        case 'transactions':
+	                $main_body = include 'admin/transactions.php';
+	                break;
+	        case 'discountcodes':
+	                $main_body = include 'admin/discountcodes.php';
+	                break;
+	        case 'edit_discount':
+	                $main_body = include 'edit_discount.php';
+	                break;
+	        case 'confirmedusers':
+	                $main_body = include 'admin/confirmedusers.php';
+	                break;
+	        case 'pendingusers':
+	                $main_body = include 'admin/pendingusers.php';
+	                break;
+	        case 'database':
+	                $main_body = include 'admin/database.php';
+	                break;
+	        default:
+	                $main_body = include 'admin/products.php';
+	                break;
+	}
 ?>
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
 	<head>
-		<link href="minimal-table.css" rel="stylesheet" type="text/css">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+		<meta name="generator" content="Hugo 0.122.0">
+		<title>Dashboard Template · Bootstrap v5.3</title>
+
+		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="assets/css/font-awesome.min.css">
+
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" href="assets/css/admin.css">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
 	</head>
+
 	<body>
-		<?php
-
-    			// Check if user is logged in
-    			if(!isset($_SESSION['user_id'])){
-    			    header("Location: login.php");
-    			    exit();
-    			}
-
-    			// Check if user is an administrator
-    			$is_admin = $_SESSION['is_admin'];
-			if (!$is_admin) {
-				echo 'Only administrators can view this page.';
-				exit();
-			}
-		?>
-
-		<a href="/index.html">Back to home page</a>
-		<hr>
-
-		<form action="db_create.php" method="post">
-			<input type="submit" value="Create database">
-		</form>
-
-		<hr>
-
-		<form action="db_delete.php" method="post">
-			<input type="submit" value="Delete database">
-		</form>
-
-		<hr>
+		<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
+			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="/admin.php">Better Buys</a>
 		
-		<!-- ********************************************** -->
-		<!-- 					Products					-->
-		<!-- ********************************************** -->
-
-		<h1>Products</h1>
-
-		<form action="product_insert.php" method="post">
-			<label for="pname">Name:</label><br>
-			<input type="text" id="pname" name="name"><br>
-
-			<label for="pdesc">Description:</label><br>
-			<input type="text" id="pdesc" name="description"><br>
-
-			<label for="pprice">Price:</label><br>
-			<input type="text" id="pprice" name="price"><br>
-
-			<label for="pquantity">Quantity:</label><br>
-			<input type="text" id="pquantity" name="quantity"><br>
-
-			<br>
-
-			<input type="submit" value="Add product">
-
-			<br>
-			<br>
-		</form>
-
-	<?php
-		$pdo = require 'connect.php';
-
-		$sql = 'SELECT id, name, description FROM Product';
+			<ul class="navbar-nav flex-row d-md-none">
+				<li class="nav-item text-nowrap">
+					<button class="nav-link px-3 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle search">
+						<svg class="bi"><use xlink:href="#search"/></svg>
+					</button>
+				</li>
+				<li class="nav-item text-nowrap">
+					<button class="nav-link px-3 text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+						<svg class="bi"><use xlink:href="#list"/></svg>
+					</button>
+				</li>
+			</ul>
 		
-		$statement = $pdo->query($sql);
+			<div id="navbarSearch" class="navbar-search w-100 collapse">
+				<input class="form-control w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search">
+			</div>
+		</header>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
+					<div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+						<div class="offcanvas-header">
+							<h5 class="offcanvas-title" id="sidebarMenuLabel">Better Buys</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+						</div>
+						<div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
+							<ul class="nav flex-column">
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=products">
+										<i class="icon-money"></i>
+										Products
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=stores">
+										<i class="icon-building"></i>
+										Stores
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=inventory">
+										<i class="icon-truck"></i>
+										Inventory
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=transactions">
+										<i class="icon-credit-card"></i>
+										Transactions
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=discountcodes">
+										<i class="icon-ticket"></i>
+										Discount Codes
+									</a>
+								</li>
+							</ul>
 		
-		// get all products
-		$products = $statement->fetchAll(PDO::FETCH_ASSOC);
+							<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
+								<span>User Management</span>
+							</h6>
+
+							<ul class="nav flex-column mb-auto">
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=confirmedusers">
+										<i class="icon-user"></i>
+										Confirmed Users
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=pendingusers">
+										<i class="icon-question"></i>
+										Pending Users
+									</a>
+								</li>
+							</ul>
 		
-		if ($products) {
-			echo "<table>";
-				echo "<tr>";
-					echo "<th>Id</th>";
-					echo "<th>Name</th>";
-					echo "<th>Description</th>";
-				echo "</tr>";
-
-				// show the products as a table
-				foreach ($products as $product) {
-					echo "<tr>";
-						echo '<td>' . $product['id'] . '</td>';
-						echo '<td>' . $product['name'] . '</td>';
-						echo '<td>' . $product['description'] . '</td>';
-
-						echo '<td>';
-							echo '<form method="post" action="product_edit.php">';
-								echo '<input type="hidden" name="product_id" value="'. $product['id'].'">';
-								echo '<input type="submit" value="Edit">';
-							echo '</form>';
-						echo '</td>';
-
-						echo '<td>';
-							echo '<form method="post" action="product_delete.php">';
-								echo '<input type="hidden" name="product_id" value="'. $product['id'].'">';
-								echo '<input type="submit" value="Delete">';
-							echo '</form>';
-						echo '</td>';
-					echo "</tr>";
-				}
-			echo "</table>";
-		} else {
-			echo "No products found!";
-		}
-	?>
-
-		<!-- ********************************************** -->
-		<!-- 					Categories					-->
-		<!-- ********************************************** -->
-
-	</form>
-
-		<hr>
-		<h1>Categories</h1>
-
-		<form action="category_insert.php" method="post">
-			<label for="cname">Category name:</label><br>
-			<input type="text" id="cname" name="category_name"><br>
-			<input type="submit" value="Add category">
-		</form>
-
-		<br>
-
-		<?php
-			$sql  = 'SELECT a.name, a.id, b.name AS parentCategoryName ';
-			$sql .= 'FROM Category a LEFT JOIN Category b ON a.parentCategory = b.id ';
-			$sql .= 'ORDER BY a.id';
-
-			$statement = $pdo->query($sql);
-			
-			// get all categories
-			$categories = $statement->fetchAll(PDO::FETCH_ASSOC);
-			
-			if ($categories) {
-				echo "<table>";
-					echo "<tr>";
-						echo "<th>Id</th>";
-						echo "<th>Name</th>";
-						echo "<th>Parent Category</th>";
-					echo "</tr>";
-
-					// show the categories as a table
-					foreach ($categories as $category) {
-						$parentCategoryName = $category['parentCategoryName'];
-
-						if ($parentCategoryName == null) {
-							$parentCategoryName = '[None]';
-						}
-							
-
-						echo "<tr>";
-							echo "<td>" . $category['id'] . '</td>';
-							echo "<td>" . $category['name'] . '</td>';
-							echo "<td>" . $parentCategoryName . '</td>';
-
-
-						echo '<td>';
-							echo '<form method="post" action="category_edit.php">';
-								echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
-								echo '<input type="submit" value="Edit">';
-							echo '</form>';
-						echo '</td>';
-
-				
-							echo '<td>';
-								echo '<form method="post" action="category_delete.php">';
-									echo '<input type="hidden" name="category_id" value="'. $category['id'].'">';
-									echo '<input type="submit" value="Delete">';
-								echo '</form>';
-							echo '</td>';
-						echo "</tr>";
-					}
-				echo "</table>";
-			} else {
-				echo "No categories found!";
-			}
-		?> 
-
-
-		<!-- ********************************************** -->
-		<!-- 					Stores						-->
-		<!-- ********************************************** -->
+							<hr class="my-3">
 		
+							<ul class="nav flex-column mb-auto">
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="admin.php?page=database">
+										<i class="icon-hdd"></i>
+										Database Maintenance
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link d-flex align-items-center gap-2" href="/">
+										<i class="icon-home"></i>
+										Return to Home Page
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 		
-	<!-- Store Management Section -->
-<hr>
-<h1>Stores</h1>
-<h2>Add Store</h2>
-<form action="store_insert.php" method="post">
-    <label for="sname">Name:</label><br>
-    <input type="text" id="sname" name="name"><br>
-    <label for="saddress">Physical Address:</label><br>
-    <input type="text" id="saddress" name="physicalAddress"><br>
-    <label for="slatitude">Latitude:</label><br>
-    <input type="text" id="slatitude" name="latitude"><br>
-    <label for="slongitude">Longitude:</label><br>
-    <input type="text" id="slongitude" name="longitude"><br>
-    <label for="sonlineOnly">Online Only:</label><br>
-    <select id="sonlineOnly" name="onlineOnly">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-    </select><br>
-    <label for="snumber">Store Number:</label><br>
-    <input type="text" id="snumber" name="storeNumber"><br>
-    <input type="submit" value="Add Store">
-</form>
-
-<!-- Display Stores -->
-<?php
-try {
-    $sql = 'SELECT * FROM Store';
-    $statement = $pdo->query($sql);
-    $stores = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-    if ($stores) {
-        echo "<table>";
-        echo "<tr>";
-        echo "<th>Store ID</th><th>Store Number</th><th>Store Name</th><th>Store Location Address</th>";
-        echo "<th>Store Latitude</th><th>Store Longitude</th><th>Online Only</th><th>Actions</th>";
-        echo "</tr>";
-
-        foreach ($stores as $store) {
-            echo "<tr>";
-            echo "<td>{$store['id']}</td><td>{$store['storeNumber']}</td><td>{$store['name']}</td>";
-            echo "<td>{$store['physicalAddress']}</td><td>{$store['latitude']}</td><td>{$store['longitude']}</td>";
-            echo "<td>" . ($store['onlineOnly'] ? "Yes" : "No") . "</td>";
-            echo "<td>";
-            echo '<form method="post" action="store_edit.php">';
-            echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
-            echo '<input type="submit" value="Edit">';
-            echo '</form>';
-            echo '<form method="post" class="delete-form" action="store_delete.php">';
-            echo '<input type="hidden" name="store_id" value="' . $store['id'] . '">';
-            echo '<input type="submit" value="Delete">';
-            echo '</form>';
-            echo "</td>";
-            echo "</tr>";
-        }
-        echo "</table>";
-    } else {
-        echo "No stores found.";
-    }
-} catch (PDOException $e) {
-    echo "Database error: " . $e->getMessage();
-}
-?>
-
-<!-- Inventory Management Section -->
-<hr>
-<h1>Inventory</h1>
-<h2>Add Inventory Item</h2>
-<form action="addStoreInv.php" method="post">
-    <label for="storeId">Store:</label>
-    <select name="storeId" id="storeId">
-        <?php foreach ($stores as $store): ?>
-            <option value="<?= htmlspecialchars($store['id']) ?>"><?= htmlspecialchars($store['name']) ?></option>
-        <?php endforeach; ?>
-    </select><br>
-    <label for="productId">Product:</label>
-    <select name="productId" id="productId">
-        <?php foreach ($products as $product): ?>
-            <option value="<?= htmlspecialchars($product['id']) ?>"><?= htmlspecialchars($product['name']) ?></option>
-        <?php endforeach; ?>
-    </select><br>
-    <label for="quantity">Quantity:</label>
-    <input type="number" name="quantity" id="quantity" min="1" required><br>
-    <input type="submit" value="Add to Inventory">
-    <!-- Button to Edit Inventory -->
-    <button type="button" onclick="window.location='editStoreInv.php'">Edit Inventory</button>
-</form>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (sessionStorage.getItem('editSuccess') === 'true') {
-        alert('Store updated successfully!');
-        sessionStorage.removeItem('editSuccess');
-    }
-    if (sessionStorage.getItem('pendingDelete') === 'true') {
-        alert('Store deleted successfully!');
-        sessionStorage.removeItem('pendingDelete');
-    }
-    document.querySelectorAll('.delete-form').forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            if (confirm('Are you sure you want to delete this store?')) {
-                sessionStorage.setItem('pendingDelete', 'true');
-                this.submit();
-            }
-        });
-    });
-});
-</script>
-
-
-
-		<!-- ********************************************** -->
-		<!-- 				Pending Users					-->
-		<!-- ********************************************** -->
-
-		<hr>
-		<h1>Pending Users</h1>
-
-		<br>
-
-		<?php
-			$sql  = 'SELECT id, emailAddress, confirmationCode, dateCreated FROM PendingUser';
-
-			$statement = $pdo->query($sql);
-			
-			// get all pending users 
-			$pending_users = $statement->fetchAll(PDO::FETCH_ASSOC);
-			
-			if ($pending_users) {
-				echo "<table>";
-					echo "<tr>";
-						echo "<th>Id</th>";
-						echo "<th>Email address</th>";
-						echo "<th>Confirmation code</th>";
-						echo "<th>Date created</th>";
-						echo "<th>Delete?</th>";
-					echo "</tr>";
-
-					// show the pending users as a table
-					foreach ($pending_users as $pending_user) {
-						echo "<tr>";
-							echo "<td>" . $pending_user['id'] . '</td>';
-							echo "<td>" . $pending_user['emailAddress'] . '</td>';
-							echo "<td>" . $pending_user['confirmationCode'] . '</td>';
-							echo "<td>" . $pending_user['dateCreated'] . '</td>';
-
-							echo '<td>';
-								echo '<form method="post" action="delete.php">';
-									echo '<input type="hidden" name="id" value="'. $pending_user['id'].'">';
-									echo '<input type="hidden" name="table_name" value="PendingUser">';
-									echo '<input type="submit" value="Delete">';
-								echo '</form>';
-							echo '</td>';
-						echo "</tr>";
-					}
-				echo "</table>";
-			} else {
-				echo "No pending users found!";
-			}
-		?> 
-
-		<!-- ********************************************** -->
-		<!-- 				Confirmed Users					-->
-		<!-- ********************************************** -->
-
-		<hr>
-		<h1>Confirmed Users</h1>
-
-		<br>
-
-		<?php
-			$sql  = 'SELECT id, firstName, lastName, physicalAddress, emailAddress, money, isAdministrator, e164PhoneNumber FROM User';
-
-			$statement = $pdo->query($sql);
-			
-			// get all users 
-			$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-			
-			if ($users) {
-				echo "<table>";
-					echo "<tr>";
-						echo "<th>Id</th>";
-						echo "<th>First name</th>";
-						echo "<th>Last name</th>";
-						echo "<th>Physical address</th>";
-						echo "<th>Email address</th>";
-						echo "<th>Money</th>";
-						echo "<th>Is administrator?</th>";
-						echo "<th>Phone number</th>";
-						echo "<th>Delete?</th>";
-					echo "</tr>";
-
-					// show the users as a table
-					foreach ($users as $user) {
-						echo "<tr>";
-							echo "<td>" . $user['id'] . '</td>';
-							echo "<td>" . $user['firstName'] . '</td>';
-							echo "<td>" . $user['lastName'] . '</td>';
-							echo "<td>" . $user['physicalAddress'] . '</td>';
-							echo "<td>" . $user['emailAddress'] . '</td>';
-							echo "<td>" . $user['money'] . '</td>';
-							echo "<td>" . ((bool)$user['isAdministrator'] ? 'True' : 'False') . '</td>';
-							echo "<td>" . $user['e164PhoneNumber'] . '</td>';
-
-							echo '<td>';
-								echo '<form method="post" action="delete.php">';
-									echo '<input type="hidden" name="id" value="'. $user['id'].'">';
-									echo '<input type="hidden" name="table_name" value="User">';
-									echo '<input type="submit" value="Delete">';
-								echo '</form>';
-							echo '</td>';
-						echo "</tr>";
-					}
-				echo "</table>";
-			} else {
-				echo "No users found!";
-			}
-		?>
-		
-		<hr>
-		<form action="view_transactions.php" method="post">
-			<input type="submit" value="View All Transactions">
-		</form>
-		
-		<hr>
-		<form action="create_discount.php" method="post">
-			<input type="submit" value="Create Discount Codes">
-		</form>
-		<br>
-		
-		<?php
-			$sql  = 'SELECT id, code, reductionType, flatReduction, multiplierReduction, startDate, expireDate, productId, usesRemaining, userId, enabled FROM DiscountCode';
-
-			$statement = $pdo->query($sql);
-			
-			// get all pending users 
-			$discountCodes = $statement->fetchAll(PDO::FETCH_ASSOC);
-			
-			if ($discountCodes) {
-				echo "<table>";
-					echo "<tr>";
-						echo "<th>Id</th>";
-						echo "<th>Code</th>";
-						echo "<th>Type</th>";
-						echo "<th>Amount</th>";
-						echo "<th>Start</th>";
-						echo "<th>End</th>";
-						echo "<th>Product</th>";
-						echo "<th>User</th>";
-						echo "<th>Uses Left</th>";
-						echo "<th>Enabled</th>";
-					echo "</tr>";
-
-					// show the pending users as a table
-					foreach ($discountCodes as $discountCode) {
-						echo "<tr>";
-							echo "<td>" . $discountCode['id'] . '</td>';
-							echo "<td>" . $discountCode['code'] . '</td>';
-							echo "<td>" . $discountCode['reductionType'] . '</td>';
-							if($discountCode['reductionType'] === 'Flat'){
-								echo "<td>" . $discountCode['flatReduction'] . '</td>';
-							}
-							else{
-								echo "<td>" . $discountCode['multiplierReduction'] . '</td>';
-							}
-							echo "<td>" . $discountCode['startDate'] . '</td>';
-							echo "<td>" . $discountCode['expireDate'] . '</td>';
-							echo "<td>" . $discountCode['productId'] . '</td>';
-							echo "<td>" . $discountCode['userId'] . '</td>';
-							echo "<td>" . $discountCode['usesRemaining'] . '</td>';
-							$isEnabled = ($discountCode['enabled'] == 1 ? 'true' : 'false');
-							echo "<td>" . $isEnabled . '</td>';
-							
-							echo '<td>';
-								echo '<form method="post" action="edit_discount.php">';
-									echo '<input type="hidden" name="discountCodeId" value="'. $discountCode['id'].'">';
-									echo '<input type="submit" value="Edit">';
-								echo '</form>';
-							echo '</td>';
-
-							echo '<td>';
-								echo '<form method="post" action="delete.php">';
-									echo '<input type="hidden" name="id" value="'. $discountCode['id'].'">';
-									echo '<input type="hidden" name="table_name" value="DiscountCode">';
-									echo '<input type="submit" value="Delete">';
-								echo '</form>';
-							echo '</td>';
-						echo "</tr>";
-					}
-				echo "</table>";
-			} else {
-				echo "No discount codes found!";
-			}
-		?>
-		
+				<!-- CONTENT SECTION -->	
+				<?=$main_body?>
+			</div>
+		</div>
+		<script src="assets/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>
-<?php ob_end_flush(); ?> 

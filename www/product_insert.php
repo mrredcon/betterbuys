@@ -10,10 +10,11 @@
 		':name' => $_POST["name"],
 		':desc' => $_POST["description"],
 		':price' => $_POST["price"],
-		':quantity' => $_POST["quantity"]
+		':quantity' => 0
 	]);
 	
 	$product_id = $pdo->lastInsertId();
 	
-	echo 'The product id ' . $product_id . ' was inserted!';
+	//echo 'The product id ' . $product_id . ' was inserted!';
+	header('Location: admin.php?page=products');
 ?> 
