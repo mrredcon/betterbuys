@@ -42,7 +42,7 @@
 
     if(!$user){
         // If user does not exist. prompt an error message
-        echo "User not found";
+        echo "Root admin cannot view the profile page or user not found.";
         exit();
     }
 
@@ -57,8 +57,12 @@
 
     // Display previous purchases
     echo "<h3>Previous Purchases</h3>";
-    // Fetch user's previous purchases from the Transaction table
-    $sql = 'SELECT productId, purchaseDate, quantity, subtotal, shippingFee FROM Transaction WHERE userId=:user_id';
+    // Fetch user's previous purchases from the TransactionItem table
+    $sql = 'SELECT ti.productId, tr.purchaseDate, ti.quantity, tr.subtotal, tr.shippingFee 
+            FROM TransactionItem ti
+            INNER JOIN Transaction tr ON ti.transactionId = tr.id
+            WHERE tr.userId = :user_id';
+
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':user_id', $user_to_show, PDO::PARAM_INT);
     $stmt->execute();
@@ -89,19 +93,9 @@
         echo "No previous purchases found.";
     }
 
-    // Allow user to add credit to their account
-    if ($is_admin || $_SESSION['user_id'] == $user_to_show) {
-        echo "<h3>Add Credit</h3>";
-        echo "<form method='post' action='add_credit.php'>";
-        echo "<input type='hidden' name='user_id' value='$user_to_show'>";
-        echo "Amount: <input type='number' step='0.01' name='amount' required><br><br>";
-        echo "<input type='submit' value='Add Credit'>";
-        echo "</form>";
-    }
-
     // Allow user to edit their profile
     if ($is_admin || $_SESSION['user_id'] == $user_to_show) {
-     echo "<a href='edit_profile.php?user_id=$user_to_show'>Edit Profile</a><br>";
+     echo "<a href='edit_profile.php?user_id=$user_to_show'><br>Edit Profile</a><br>";
     }
 
     // Delete account link (only visible to logged-in user)
