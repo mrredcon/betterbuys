@@ -15,21 +15,24 @@
 		** Uncomment to temporarily seed database with a single record if this is your first time executing this page.
 		   
 		** Some variables are hardcoded for the sake of displaying data until homepage data can be retrieved.
-
-		$pdo->exec("INSERT INTO Store VALUES ( 1, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Best Buy Rim', 0);");
+		
+		$pdo->exec("INSERT INTO ProductImage VALUES ( 1, '\\images\\gudetama.jpg', 1, 0);");
+		echo "Product Image created successfully.";
+		
+		$pdo->exec("INSERT INTO Store VALUES ( 1, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Better Buys Rim', 0);");
 		echo "Store created successfully.";
 		
 		$pdo->exec("INSERT INTO Inventory VALUES ( 1, 1, 10);");
 		echo "Inventory created successfully.";
 		*/
-
-		$product_id = '1';//filter_input(INPUT_POST, 'product_id');
+		
+		$product_id = filter_input(INPUT_POST, 'product_id');
 		$store_id = '1';
 
 		// Retrieve product record from Product and ProductImage
-		$sql = 'SELECT * FROM Product p INNER JOIN ProductImage pi ON p.id = pi.productId WHERE p.id = ' . $product_id . ';';
-
-		$statement = $pdo->query($sql);
+		$sql = "SELECT * FROM Product p INNER JOIN ProductImage pi ON p.id = pi.productId WHERE p.id = :product_id;";
+		$statement = $pdo->prepare($sql);
+        $statement->execute([':product_id' => $product_id]);
 	
 		$product = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -42,9 +45,9 @@
 		$product_quantity = '';
 		
 		// Retrieve store record from Store and Inventory
-		$sql = 'SELECT s.name, onlineOnly, storeId, productId, i.quantity FROM Store s INNER JOIN Inventory i ON s.id = i.storeId INNER JOIN Product p ON p.id = i.productId WHERE s.id = ' . $store_id . ';';
-
-		$statement = $pdo->query($sql);
+		$sql = "SELECT s.name, onlineOnly, storeId, productId, i.quantity FROM Store s INNER JOIN Inventory i ON s.id = i.storeId INNER JOIN Product p ON p.id = i.productId WHERE s.id = :store_id;";
+		$statement = $pdo->prepare($sql);
+        $statement->execute([':store_id' => $store_id]);
 	
 		$store = $statement->fetch(PDO::FETCH_ASSOC);
 		
@@ -131,7 +134,7 @@
 	
     <section> <!--Availability Selection start-->
         <div>
-			<h3>Availability</h3>
+			<h4>Availability</h4>
 						
 			<form method="post" action="shopping_cart.php" id="availability-form">	
 
@@ -178,7 +181,6 @@
 							return false;
 						}
 						else {
-							document.getElementById("availability-form").submit();
 							alert('Successfully added to shopping cart!');
 							return true;
 						}
