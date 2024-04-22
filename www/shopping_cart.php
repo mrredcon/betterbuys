@@ -217,9 +217,7 @@
 						echo '<table class="table">';
 							echo '<thead>';
 								echo "<tr>";
-									echo "<th>Id</th>";
 									echo "<th>Name</th>";
-									echo "<th>Description</th>";
 									echo "<th>Quantity</th>";
 									echo "<th>Price</th>";
 									echo "<th>Remove?</th>";
@@ -230,9 +228,7 @@
 							echo '<tbody>';
 							foreach ($products as $product){
 								echo "<tr>";
-									echo '<td>' . $product['id'] . '</td>';
-									echo '<td>' . $product['name'] . '</td>';
-									echo '<td>' . $product['description'] . '</td>';
+									echo '<td><a href="/product_detail.php?product_id=' . $product['id'] . '">' . $product['name'] . '</a></td>';
 									echo '<td>' . $item_array[$product['id']] . '</td>';
 									if($product['discount']){
 										echo '<td><del>' . sprintf('%.2f', $product['price'] * $item_array[$product['id']]) . '</del> ' . sprintf('%.2f', ($product['price'] - $product['discount']) * $item_array[$product['id']]) . '</td>';
