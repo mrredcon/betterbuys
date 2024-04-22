@@ -23,6 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $password = filter_input(INPUT_POST, 'password');
     if (!$password) {
 	    echo 'Password given was either blank or in an invalid format.';
+	    exit();
     }
 
     // Make sure the password fits our requirements
@@ -60,8 +61,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if ($remaining < 1) {
     	// Purge any old entries from PendingUser
 	$rows_to_delete = ($remaining * -1) + 1;
-	$deleted = $pdo->query('DELETE FROM PendingUser ORDER BY date ASC LIMIT ' . $rows_to_delete);
-	echo 'Deleted ' . $deleted->fetchColumn() . ' pending users from the database.<br>';
+	$pdo->query('DELETE FROM PendingUser ORDER BY date ASC LIMIT ' . $rows_to_delete);
+	//echo 'Deleted ' . $deleted->fetchColumn() . ' pending users from the database.<br>';
     }
 
     // Check if this new user has a pending entry in the database
@@ -71,9 +72,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
 
-    if ($stmt->rowCount() > 0) {
-        echo 'Detected unfinished pending registration, deleting them.<br>';
-    }
+    // if ($stmt->rowCount() > 0) {
+    //     echo 'Detected unfinished pending registration, deleting them.<br>';
+    // }
 
     // Insert user info into the database (unconfirmed)
     $confirmation_code = random_int(1, 2147483647);
@@ -99,7 +100,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //SMTP::DEBUG_OFF = off (for production use)
     //SMTP::DEBUG_CLIENT = client messages
     //SMTP::DEBUG_SERVER = client and server messages
-    $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+    $mail->SMTPDebug = SMTP::DEBUG_OFF;
     
     //Set the hostname of the mail server
     $mail->Host = $config['smtp_server'];

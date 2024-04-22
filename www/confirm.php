@@ -59,8 +59,7 @@ if ($confirmation_code && $user_id) {
 		':email' => $pending_user['emailAddress']
 	]);
 
-	echo 'Deleted ' . $stmt->rowCount() . ' pending users from the database.<br>';
-
+	//echo 'Deleted ' . $stmt->rowCount() . ' pending users from the database.<br>';
     	echo "Email address confirmed successfully!";
     } else {
 	echo 'Failed to create new user.';
