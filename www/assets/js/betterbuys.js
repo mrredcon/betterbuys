@@ -7,11 +7,13 @@ let pageNum = 1;
 function showControls() {
 	$("#btnSortPrice").show();
 	$("#btnSortName").show();
+	$("#btnSortQuantity").show();
 }
 
 function hideControls() {
 	$("#btnSortPrice").hide();
 	$("#btnSortName").hide();
+	$("#btnSortQuantity").hide();
 }
 
 function noProductsFound() {
@@ -34,8 +36,10 @@ function changeToPage(newPageNum) {
 			response = data;
 			if (sortBy === 'name') {
 				sortName(direction);
-			} else {
+			} else if (sortBy === 'price') {
 				sortPrice(direction)
+			} else if (sortBy === 'quantity') {
+				sortQuantity(direction)
 			}
 
 			drawPaginator();
@@ -48,7 +52,10 @@ function changeToPage(newPageNum) {
 function drawPaginator() {
 	const BUTTONS = 3;
 
-	const pages = Math.floor(response.total / response.entriesPerPage) + 1;
+	let pages = Math.floor(response.total / response.entriesPerPage);
+	if (pages == 0) {
+		pages = 1;
+	}
 
 	const current = response.currentPage;
 	let previous = response.currentPage - 1;
@@ -112,10 +119,7 @@ function drawProducts() {
 			<div class="card" style="height: 34rem;">
 				<img class="card-img-top object-fit-contain mb-auto" style="height: 60%;" src="${product.imagePath}">
 				<div class="card-body d-flex flex-column align-items-center" style="height: 40%;">
-					<form method="post" action="product_detail.php">
-						<input type="hidden" name="product_id" value="${product.id}">
-						<button class="btn btn-link card-text flex-grow-1" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp:2; line-clamp: 2; -webkit-box-orient: vertical;" href="product_detail.php">${product.name}</button>
-					</form>
+					<a class="card-text link-underline link-underline-opacity-0 link-underline-opacity-100-hover mb-2" href="product_detail.php?product_id=${product.id}">${product.name}</a>
 					<br>`
 
 					if (product.discount === null) {
@@ -159,6 +163,20 @@ function sortPrice(direction) {
 	} else if (direction === "desc") {
 		response.data.sort((a, b) => {
 			return parseFloat(b.price) - parseFloat(a.price);
+		});
+	}
+
+	drawProducts();
+}
+
+function sortQuantity(direction) {
+	if (direction === "asc") {
+		response.data.sort((a, b) => {
+			return parseInt(a.quantity) - parseInt(b.quantity);
+		});
+	} else if (direction === "desc") {
+		response.data.sort((a, b) => {
+			return parseInt(b.quantity) - parseInt(a.quantity);
 		});
 	}
 
@@ -222,6 +240,7 @@ btnSortName.addEventListener("click", () => {
 			}
 
 			btnSortPrice.innerHTML = "Sort by price";
+			btnSortQuantity.innerHTML = "Sort by quantity";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
 			noProductsFound();
@@ -250,6 +269,36 @@ btnSortPrice.addEventListener("click", () => {
 			}
 
 			btnSortName.innerHTML = "Sort by name";
+			btnSortQuantity.innerHTML = "Sort by quantity";
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			noProductsFound();
+		});
+});
+
+const btnSortQuantity = document.querySelector("#btnSortQuantity");
+btnSortQuantity.addEventListener("click", () => {
+	direction = btnSortQuantity.value;
+	sortBy = 'quantity';
+
+	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
+		.done(function(data, textStatus, jqXHR) {
+			showControls();
+			response = data;
+			sortQuantity(direction)
+
+			drawPaginator();
+
+			if (btnSortQuantity.value === "asc") {
+				btnSortQuantity.innerHTML = 'Sort by quantity <i class="icon-sort-by-order"></i>';
+				btnSortQuantity.value = "desc";
+			} else if (btnSortQuantity.value === "desc") {
+				btnSortQuantity.innerHTML = 'Sort by quantity <i class="icon-sort-by-order-alt"></i>';
+				btnSortQuantity.value = "asc";
+			}
+
+			btnSortName.innerHTML = "Sort by name";
+			btnSortPrice.innerHTML = "Sort by price";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
 			noProductsFound();

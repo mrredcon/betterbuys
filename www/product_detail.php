@@ -1,3 +1,58 @@
+<?php
+	session_start();
+
+	$pdo = require_once 'connect.php';
+
+	$is_logged_in=false;
+	$username='';
+	if(array_key_exists('login', $_SESSION)) {
+	    $is_logged_in=true;
+	    $username=$_SESSION['login'];
+	}
+
+	$is_admin=false;
+        if(array_key_exists('is_admin', $_SESSION) && $_SESSION['is_admin']) {
+	    $is_admin=true;
+        }
+
+	$product_id = filter_input(INPUT_GET, 'product_id');
+	$store_id = '1';
+
+	// Retrieve product record from Product and ProductImage
+	$sql = "SELECT p.id, p.name, p.description, p.price, p.discount, pi.filepath, inv.quantity as quantity
+		FROM Product p
+		LEFT JOIN ProductImage pi ON p.id = pi.productId AND pi.priority = 0
+		LEFT JOIN Inventory inv ON inv.productId = p.id AND inv.storeId = 1
+		WHERE p.id = :product_id;";
+
+	$statement = $pdo->prepare($sql);
+	$statement->execute([':product_id' => $product_id]);
+
+	$product = $statement->fetch(PDO::FETCH_ASSOC);
+
+	$product_name = $product['name'];
+	$product_description = $product['description'];
+	$product_price = $product['price'];
+	$product_discount = $product['discount'];
+
+	// Product is not on sale.
+	if ($product_discount == 0) {
+		$product_discount = null;
+	}
+
+	$product_image = $product['filepath'];
+	
+	// Retrieve store record from Store
+	$sql = "SELECT name, onlineOnly FROM Store WHERE id=:store_id";
+	$statement = $pdo->prepare($sql);
+	$statement->execute([':store_id' => $store_id]);
+
+	$store = $statement->fetch(PDO::FETCH_ASSOC);
+	
+	$store_name = $store['name'];
+	$store_pickup = $store['onlineOnly'];
+	$store_inventory = $product['quantity'];
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,211 +60,150 @@
 </head>
 
 <body>
-	<a href="index.php">Back to homepage</a>
+	<nav class="navbar navbar-expand-lg bg-body-tertiary">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/" id="btnLogo">Better Buys</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
 
-	<!--DB Logic start-->
-	<?php
-		$pdo = require_once 'connect.php';
-
-		/* 
-		** Uncomment to temporarily seed database with a single record if this is your first time executing this page.
-		   
-		** Some variables are hardcoded for the sake of displaying data until homepage data can be retrieved.
-		
-		$pdo->exec("INSERT INTO ProductImage VALUES ( 1, '\\images\\gudetama.jpg', 1, 0);");
-		echo "Product Image created successfully.";
-		
-		$pdo->exec("INSERT INTO Store VALUES ( 1, 1, '17414 La Cantera, San Antonio, TX 78257', 29.6056067, -98.5986546, 0, 'Better Buys Rim', 0);");
-		echo "Store created successfully.";
-		
-		$pdo->exec("INSERT INTO Inventory VALUES ( 1, 1, 10);");
-		echo "Inventory created successfully.";
-		*/
-		
-		$product_id = filter_input(INPUT_POST, 'product_id');
-		$store_id = '1';
-
-		// Retrieve product record from Product and ProductImage
-		$sql = "SELECT * FROM Product p LEFT JOIN ProductImage pi ON p.id = pi.productId WHERE p.id = :product_id;";
-		$statement = $pdo->prepare($sql);
-        $statement->execute([':product_id' => $product_id]);
-	
-		$product = $statement->fetch(PDO::FETCH_ASSOC);
-
-		$product_name = $product['name'];
-		$product_description = $product['description'];
-		$product_price = $product['price'];
-		$product_discount = $product['discount'];
-		$product_image = $product['filepath'];
-		$product_priority = $product['priority'];
-		$product_quantity = '';
-		
-		// Retrieve store record from Store and Inventory
-		$sql = "SELECT s.name, onlineOnly, storeId, productId, i.quantity FROM Store s INNER JOIN Inventory i ON s.id = i.storeId INNER JOIN Product p ON p.id = i.productId WHERE s.id = :store_id;";
-		$statement = $pdo->prepare($sql);
-        $statement->execute([':store_id' => $store_id]);
-	
-		$store = $statement->fetch(PDO::FETCH_ASSOC);
-		
-		$store_name = $store['name'];
-		$store_pickup = $store['onlineOnly'];
-		$store_inventory = $store['quantity'];
-
-		// TEMP: Check and set discount
-		if ($product_discount) {
-			$discount_type = 'percentage';
-		}
-
-		# Begin display
-		echo '<h1>' . $product_name . '</h1>';
-
-		echo '<div class="row">';
-		echo '<h2>SALE: ' . $product_discount . ' off!</h2>';
-		echo '</div>';
-		
-		# In stock?
-		if ($store_inventory < 1) {
-			echo '<h3>Not in stock</h3>';
-			echo '<h4>We\'re sorry, this item is currently not in stock</h4>';
-		}
-		else {
-			echo '<h3>In stock</h3>';
-		
-	?>
-	<!--DB Logic end-->
-
-	<hr>
-
-	<div> <!--Product Image start-->
-	<?php
-        # TODO: Add carousel functionality if there are multiple images
-        # Note: Single image should have priority 0 default; Other, display image 0
-		//foreach ($product_image as $image) {
-			echo '<td><img src="' . $product_image . '"</td>';
-		//}
-	?>
-	</div> <!--Product Image end-->
-
-	<hr>
-
-	<div> <!--Product Description start-->
-		<?php
-				// Sale?
-				if ($product_discount && $product_price >= $product_discount) {
-					if ($discount_type == 'percentage') {
-						$discount_price = $product_price * $product_discount;
-						echo '<div class="row">';
-						echo '<div class="col-sm-6">';
-							echo '<h2>$'	. $discount_price . '</h2>';
-						echo '</div>';
-						
-						echo '<div class="col-sm-6">';
-							echo 'Originally <s>$' . $product_price . '</s>';
-						echo '</div>';
-						echo '</div>';
-					}
-					else if ($discount_type == 'flat') {
-						$discount_price = $product_price - $product_discount;
-						echo '<div class="row">';
-							echo '<h2>$' . $discount_price . '</h2>';
-						echo '</div>';
-						echo '<div class="row">';
-							echo 'Originally <s>$' . $product_price . '</s>';
-						echo '</div>';
-					}
-				}
-				else {
-					echo '<div class="row">';
-						echo '<b>$' . $product_price . '</b>';
-					echo '</div">';
-				}
-				echo '<div class="row">';
-					echo 'Item Description';
-				echo '</div>';
-				echo '<div class="row">';
-					echo '<div class="col-sm-6">' . $product_description . '</div>';
-				echo '</div>';
-		?>
-	</div> <!--Product Description end-->
-	
-    <section> <!--Availability Selection start-->
-        <div>
-			<h4>Availability</h4>
-						
-			<form method="post" action="shopping_cart.php" id="availability-form">	
-
-				<!--Delivery Option start-->
-				<div class="row">
-					<div class="form-group" id="delivery">
-						<input type="radio" name="availability" value="delivery" id="delivery" required>
-						<label for="delivery">Delivery</label>
-					</div>
-                    <!--Delivery Option end-->
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item"><a class="nav-link" aria-current="page" href="/" id="btnHome">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="shopping_cart.php">Shopping Cart</a></li>
 
 					<?php
-						// Check if pickup option is available
-						if ($store_pickup == 0) {
-							// Pick Up Option start
-							echo '<div class="form-group" id="pickup">';
-								echo '<input type="radio" name="availability" value="pickup" id="pickup">';
-								echo '<label for="pickup">Pick Up</label>';
-							echo '</div>';
-							// Pick Up Option end
+						if ($is_logged_in) {
+							if ($is_admin) {
+								echo '<li class="nav-item"><a class="nav-link text-danger" href="admin.php">Admin panel</a></li>';
+							} else {
+								echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
+							}
+
+							echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
+						} else {
+							echo '<li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>';
+							echo '<li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>';
 						}
 					?>
-                </div>
+				</ul>
 
-				<div>
-					<?php
-						echo '<table>';
-							echo '<th>' . $store_name . '</th>';
-							echo '<tr>';
-							echo '<td>Only ' . $store_inventory . ' left</td>';
-							echo '</tr>';
-						echo '</table>';
-					?>
-				</div>
+				<?php
+					if ($is_logged_in) {
+						echo '<p class="my-2 me-2">You' . "'" . 're logged in as: ' . $_SESSION['login'] . '</p>';
+					}
+				?>
+
+				<form class="d-flex" role="search" id="formSearch">
+					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="inputSearch">
+					<button class="btn btn-outline-success" type="submit" id="btnSearch"><i class="icon-search"></i></button>
+				</form>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+		<div class="row mt-3">
+			<div class="col-6 d-flex justify-content-center">
+				<?php
+        				# TODO: Add carousel functionality if there are multiple images
+        				# Note: Single image should have priority 0 default; Other, display image 0
+						//foreach ($product_image as $image) {
+						if ($product_image) {
+							echo '<img class="w-100 h-auto p-3" src="' . $product_image . '">';
+						} else {
+							echo '<h1 class="text-center align-self-center">No image available!</h1>';
+						}
+				?>
+			</div>
+
+			<div class="col-6">
+				<!--DB Logic start-->
+				<?php
+					# Begin display
+					echo '<h1>' . $product_name . '</h1>';
+	#
+					# In stock?
+					if ($store_inventory < 1) {
+						echo '<h3>Not in stock</h3>';
+						echo '<h4>We\'re sorry, this item is currently not in stock</h4>';
+					} else {
+						echo '<h3>In stock</h3>';
+					}
+
+					// Sale?
+					if ($product_discount) {
+						$discount_price = $product_price - $product_discount;
+
+						echo '<h2 class="text-primary"><b>SALE: $' . $product_discount . ' off!</b></h2>';
+						echo 'Originally <s>$' . $product_price . '</s><br>';
+						
+						echo '<h2>$' . number_format((float)$discount_price, 2, '.', '') . '</h2><br>';
+					} else {
+						echo '<h2><b>$' . $product_price . '</b></h2>';
+					}
+
+					echo 'Item Description:';
+					echo '<div class="col-sm-6">' . $product_description . '</div>';
+				?>
+				<!--Product Description end-->
+
+				<h4 class="mt-5">Availability</h4>
+
+				<div class="mb-1"><?= $store_inventory ?> left at <b><?= $store_name ?></b></div>
+
+				<form method="post" action="shopping_cart.php" id="availability-form" class="row">
+					<input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+
+					<!--Delivery Option start-->
+					<div class="mb-3" id="delivery">
+						<input type="radio" name="availability" value="delivery" id="delivery" required>
+						<label for="delivery" class="me-3">Delivery</label>
+
+						<?php
+							// Check if pickup option is available
+							if ($store_pickup == 0) {
+						?>
+								<input type="radio" name="availability" value="pickup" id="pickup">
+								<label for="pickup">Pick Up</label>
+						<?php
+							}
+						?>
+
+					</div>
+                    			<!--Delivery Option end-->
+
+
+					<div class="mb-3">
+						<label for="inputAmount" class="form-label">Desired product quantity:</label>
+						<input type="number" class="form-control" id="inputAmount" name="amount" value="1" required>
+					</div>
+
+					<button type="submit" class="btn btn-primary mb-2" value="Add to cart" onclick="return validateForm(<?= $store_inventory ?>);">Add Product</button>
+				</form>
+
 				
 				<!--Validate amount inputted-->
 				<script>
 					function validateForm(max) {
-						var numberInput = document.getElementById("amount").value;
+						var numberInput = document.getElementById("inputAmount").value;
 						var number = parseInt(numberInput);
 						
-						if (number > max) {
+						if (number <= 0) {
+							alert('Please enter an amount greater than zero.');
+							return false;
+						} else if (number > max) {
 							alert('Please enter an amount less than or equal to available stock.');
 							return false;
-						}
-						else {
-							alert('Successfully added to shopping cart!');
+						} else {
+							document.getElementById("availability-form").submit();
 							return true;
 						}
 					}
 				</script>
 				<!--End validation-->
-
-				<!--Enter desired amount-->
-				<div class="form-group">
-					<label for="amount">Enter an amount: </label>
-					<input type="number" id="amount" name="amount" min="0" required>
-				</div>
-				<!--Enter amount end-->
-
-				<?php 
-				// Set selected product quantity
-				$product_quantity = isset($_POST['amount']) ? $_POST['amount'] : '';
-            
-					echo '<div class="row">';
-						echo '<div class="form-group">';
-						echo '<input type="hidden" name="product_id" value="' . $product['id'] . '">';
-						echo '<input type="submit" value="Add to cart" onclick="return validateForm(' . $store_inventory . ');">';
-						echo '</div>';
-					echo '</div>';
-				echo '</form>';
-				}
-            ?>
-
+			</div>
 		</div>
-    </section> <!--Availability Selection end-->
+	</div>
 </body>
 </html>

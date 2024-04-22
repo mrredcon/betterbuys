@@ -34,6 +34,9 @@
 			':enabled' => (isset($_POST['checkbox']) ? 1 : 0),
 			':id' => $discountCodeId
 		]);
+
+            	header('Location: /admin.php?page=discountcodes');
+            	exit;
 	}
 
 	// retrieve a single code
@@ -46,56 +49,75 @@
 	
 	$amount = ($discountCode['reductionType'] === 'Flat') ? $discountCode['flatReduction'] : $discountCode['multiplierReduction'];
 	$isEnabled = ($discountCode['enabled']) ? 'yes' : 'no';
-?>
 
-<!DOCTYPE html>
-<html>
-	<head>
-	</head>
-	<body>
-		<a href="admin.php" class="menu-item">Return to Admin page</a>
-		
-		<h1>Edit Discount Code</h1>
+	$multiplier_selected = $discountCode['reductionType'] === 'Multiplier' ? 'selected' : '';
+	$discount_enabled = $discountCode['enabled'] == 1 ? 'checked' : '';
 
-		<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-			<label for="dcode">Code:</label><br>
-			<input type="text" id="dcode" name="code" value=<?php echo $discountCode['code']; ?>><br><br>
-			
-			<label for="damount">Discount Amount:</label><br>
-			<input type="text" id="damount" name="amount" value=<?php echo $amount; ?>><br>
-			
-			<select name="redtype">  
-				<option value='Flat'>Flat Reduction</option>  
-				<option value='Multiplier'  <?php if($discountCode['reductionType'] === 'Multiplier') echo 'selected="selected"';?>>Multiplier Reduction</option>  
-			</select>
-			<br><br>
+	$html = <<<EOD
 
-			<label for="expiredate">Expiration Date:</label><br>
-			<input type="date" id="expiredate" name="expiration" value=<?php echo $discountCode['expireDate']; ?>><br><br>
-			
-			<label for="cbox">Enabled:</label><br>
-			<input type="checkbox" id="cbox" name="checkbox" value="yes" <?php echo ($discountCode['enabled']==1 ? 'checked' : '');?>><br>
-			
-			<br>
-			<span style="font-size: 20px;">Optional:</span>
-			<br><br>
-			
-			<label for="dproduct">Product ID:</label><br>
-			<input type="text" id="dproduct" name="productId" value=<?php echo $discountCode['productId']; ?>><br>
-			
-			<label for="duser">User ID:</label><br>
-			<input type="text" id="duser" name="userId" value=<?php echo $discountCode['userId']; ?>><br>
-			
-			<label for="duses">Total Uses:</label><br>
-			<input type="text" id="duses" name="totalUses" value=<?php echo $discountCode['usesRemaining']; ?>><br><br>
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<h1 class="h2">Discount Codes</h1>
+	</div>
 
-			<input type="submit" name="submitted" value="Edit Discount Code">
-			
-			<input type="hidden" name="discountCodeId" value=<?php echo $discountCodeId; ?>>
-			<input type="hidden" name="oldCode" value=<?php echo $discountCode['code']; ?>>
 
-			<br>
-			<br>
+	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<form method="post">
+			<div class="mb-3">
+				<label for="inputCode" class="form-label">Code</label>
+				<input type="text" class="form-control" id="inputCode" aria-describedby="helpCode" name="code" value="{$discountCode['code']}">
+				<div id="helpCode" class="form-text">This is the code that the customer needs to enter to access the discount.</div>
+			</div>
+
+			<div class="mb-3">
+				<label for="inputDiscountAmount" class="form-label">Discount Amount</label>
+				<input type="text" class="form-control" id="inputDiscountAmount" name="amount" value={$amount}>
+			</div>
+
+			<div class="mb-3">
+				<label for="selectReductionType" class="form-label">Reduction Type</label>
+				<select class="form-select" id="selectReductionType" name="redtype">
+					<option value='Flat'>Flat Reduction</option>  
+					<option value='Multiplier' {$multiplier_selected} >Multiplier Reduction</option>  
+				</select>
+			</div>
+
+			<div class="mb-3">
+				<label for="inputEnabled" class="form-label">Enabled</label>
+				<input type="checkbox" id="inputEnabled" name="checkbox" {$discount_enabled}>
+			</div>
+
+			<div class="mb-3">
+				<label for="inputExpirationDate" class="form-label">Expiration Date</label>
+				<input type="date" id="inputExpirationDate" name="expiration" value={$discountCode['expireDate']}><br><br>
+			</div>
+
+			<h4>Optional settings</h4>
+
+			<div class="mb-3">
+				<label for="inputProductId" class="form-label">Product ID</label>
+				<input type="text" class="form-control" id="inputProductId" name="productId" value={$discountCode['productId']}>
+			</div>
+
+
+			<div class="mb-3">
+				<label for="inputUserId" class="form-label">User ID</label>
+				<input type="text" class="form-control" id="inputUserId" name="userId" value={$discountCode['userId']}>
+			</div>
+
+			<div class="mb-3">
+				<label for="inputUses" class="form-label">Total Uses</label>
+				<input type="text" class="form-control" id="inputUses" name="totalUses" value={$discountCode['usesRemaining']}>
+			</div>
+
+			<input type="hidden" name="discountCodeId" value={$discountCodeId}>
+			<input type="hidden" name="oldCode" value={$discountCode['code']}>
+
+			<button type="submit" class="btn btn-primary mb-2" name="submitted" value="Edit Discount Code">Edit Discount Code</button>
 		</form>
-	</body>
-</html>
+	</div>
+</main>
+EOD;
+
+	return $html;
+?>
