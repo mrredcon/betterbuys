@@ -30,7 +30,7 @@
 		$store_id = '1';
 
 		// Retrieve product record from Product and ProductImage
-		$sql = "SELECT * FROM Product p INNER JOIN ProductImage pi ON p.id = pi.productId WHERE p.id = :product_id;";
+		$sql = "SELECT * FROM Product p LEFT JOIN ProductImage pi ON p.id = pi.productId WHERE p.id = :product_id;";
 		$statement = $pdo->prepare($sql);
         $statement->execute([':product_id' => $product_id]);
 	
