@@ -30,7 +30,6 @@ services:
         volumes:
             - './www:/var/www/html'
             - './config/nginx:/etc/nginx/conf.d:ro'
-            - 'images:/var/www/html/images'
         depends_on:
             - php
 
