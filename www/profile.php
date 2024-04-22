@@ -12,14 +12,15 @@
 	
 	// System check for if user trying to access their account
 	$user_to_show = filter_input(INPUT_GET, 'user_id');
+
 	if ($user_to_show && !$is_admin && $user_to_show != $_SESSION['user_id']) {
 	    // If not, deny access
 	    echo "Access Denied";
 	    exit();
 	}
 	
-	// If we are missing the GET parameter, just assume user is viewing their own profile
-	if (!$user_to_show) {
+	if (!isset($user_to_show)) {
+		// If we are missing the GET parameter, just assume user is viewing their own profile
 	        $user_to_show = $_SESSION['user_id'];
 	}
 	
@@ -45,6 +46,10 @@
 	    $address = $_POST['address'];
 	    $phone_number = $_POST['phone_number'] ?: null;
 	    $money = $_POST['money'];
+	    $user_to_edit = $_SESSION['user_id'];
+	    if ($is_admin) {
+		$user_to_edit = $_POST['user_id_to_edit'];
+	    }
 	
 	    // Validate money amount
 	    if($money < 0) {
@@ -60,11 +65,11 @@
 	    $stmt->bindParam(':address', $address, PDO::PARAM_STR);
 	    $stmt->bindParam(':phone_number', $phone_number);
 	    $stmt->bindParam(':money', $money, PDO::PARAM_STR);
-	    $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+	    $stmt->bindParam(':user_id', $user_to_edit, PDO::PARAM_INT);
 	    $stmt->execute();
 	
 	    // Redirect back to profile page after updating
-	    header("Location: profile.php");
+	    header("Location: profile.php?user_id={$user_to_edit}");
 	    exit();
 	}
 ?>
@@ -92,14 +97,16 @@
 					</li>
 
 					<li class="nav-item"><a class="nav-link" href="shopping_cart.php">Shopping Cart</a></li>
-					<li class="nav-item"><a class="nav-link active" href="profile.php">Profile</a></li>
-					<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>
 
 					<?php
 						if ($is_admin) {
 							echo '<li class="nav-item"><a class="nav-link text-danger" href="admin.php">Admin panel</a></li>';
+						} else {
+							echo '<li class="nav-item"><a class="nav-link active" href="profile.php">Profile</a></li>';
 						}
 					?>
+
+					<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>
 				</ul>
 
 				<p class="my-2 me-2">You're logged in as: <?= $_SESSION['login'] ?></p>
@@ -109,6 +116,8 @@
 
 	<div class="container">
 		<form class="row g-3 mt-2 mb-3" method="post">
+			<input type="hidden" name="user_id_to_edit" value="<?= $user_to_show ?>">
+
 			<div class="col-12">
 				<label class="form-label" for="inputFirstName">First Name</label>
 				<input id="inputFirstName" class="form-control" type="text" value="<?=$user['firstName']?>" name="first_name">

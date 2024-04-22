@@ -22,7 +22,8 @@
 							<th>Money</th>
 							<th>Is administrator?</th>
 							<th>Phone number</th>
-							<th>Delete?</th>
+							<th>Edit</th>
+							<th>Delete</th>
 						</tr>
 					</thead>
 		EOD;
@@ -43,10 +44,14 @@
 					<td>{$user['e164PhoneNumber']}</td>
 
 					<td>
+						<a class="btn py-0" href="profile.php?user_id={$user['id']}"><i class="icon-edit"></i></button>
+					</td>
+
+					<td>
 						<form method="post" action="delete.php">
 							<input type="hidden" name="id" value="{$user['id']}">
 							<input type="hidden" name="table_name" value="User">
-							<input type="submit" value="Delete">
+							<button type="submit" value="Delete" class="btn py-0"><i class="icon-remove"></i></button>
 							<input type="hidden" name="redirect" value="/admin.php?page=confirmedusers">
 						</form>
 					</td>
