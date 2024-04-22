@@ -1,0 +1,9 @@
+/* CSS for button link styling */
+.btn-link {
+    background-color: transparent;
+    border: none;
+    color: #007bff; 
+    text-decoration: underline;
+    cursor: pointer; 
+    padding: 0; 
+}

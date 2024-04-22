@@ -44,15 +44,61 @@
 		}
 	}
 	else{
-	
-		if(!filter_input(INPUT_POST, 'remove')){
-		
+		if(filter_input(INPUT_POST, 'remove')){
+			$remove_id = filter_input(INPUT_POST, 'remove');
+			$data = json_decode($_COOKIE['shoppingCart'], true);
+			unset($data[$remove_id]);
+			setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
+			header("Refresh:0");
+			exit;
+		}
+		else if(filter_input(INPUT_POST, 'save')){
+			$product_id = filter_input(INPUT_POST, 'save');
+			$order_amount = filter_input(INPUT_POST, 'samount');
+			if(!is_numeric($order_amount)){
+				header("Location: shopping_cart.php?error=quantityNotAnInteger");
+				exit;
+			}
+			
+			$sql = 'SELECT quantity FROM Inventory WHERE productId=' . $product_id . ' AND storeId=1';
+			
+			$statement = $pdo->query($sql);
+				
+			$inventory = $statement->fetchColumn();
+			
+			$data = json_decode($_COOKIE['shoppingCart'], true);
+			if($order_amount > $inventory){
+				$order_amount = $inventory;
+				$data[$product_id] = $order_amount;
+				setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
+				header("Location: shopping_cart.php?error=quantityTooHigh");
+				exit;
+			}
+			else if($order_amount == 0){
+				unset($data[$product_id]);
+			}
+			else{
+				$data[$product_id] = $order_amount;
+			}
+			setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
+			
+			header("Refresh:0");
+			exit;
+		}
+		else{
 			$product_id = filter_input(INPUT_POST, 'product_id');
 			$order_amount = filter_input(INPUT_POST, 'amount');
 			if(!$order_amount || $order_amount < 1){
 				$order_amount = 1;
 			}
+		
 			if ($product_id){
+				$sql = 'SELECT quantity FROM Inventory WHERE productId=' . $product_id . ' AND storeId=1';
+			
+				$statement = $pdo->query($sql);
+				
+				$inventory = $statement->fetchColumn();
+			
 				if(!isset($_COOKIE['shoppingCart'])){
 					$data = array($product_id=>$order_amount);
 					setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
@@ -60,34 +106,26 @@
 				else{
 					$data = json_decode($_COOKIE['shoppingCart'], true);
 					if(in_array($product_id, array_keys($data))){
-						$data[$product_id] = $data[$product_id]+$order_amount;
-					}
-					else{
+						if($data[$product_id]+$order_amount > $inventory){
+							$order_amount = $inventory;
+						}
+						else{
+							$order_amount = $data[$product_id]+$order_amount;
+						}
 						$data[$product_id] = $order_amount;
 					}
+					else{
+						if($order_amount > $inventory){
+							$order_amount = $inventory;
+						}
+						$data[$product_id] = $order_amount;
+					}
+					
 					setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
 				}			
 				header("Refresh:0");
 				exit;
 			}
-		
-		}
-		else{
-			$remove_id = filter_input(INPUT_POST, 'remove');
-			$remove_amount = filter_input(INPUT_POST, 'ramount');
-			if(!$remove_amount || $remove_amount < 1){
-				$remove_amount = 2147483647;
-			}
-			$data = json_decode($_COOKIE['shoppingCart'], true);
-			if($data[$remove_id] - $remove_amount < 1){
-				unset($data[$remove_id]);
-			}
-			else{
-				$data[$remove_id] = $data[$remove_id] - $remove_amount;
-			}
-			setcookie('shoppingCart', json_encode($data), time() + (86400 * 30), "/");
-			header("Refresh:0");
-			exit;
 		}
 	
 	}
@@ -140,10 +178,16 @@
 						}
 						?>
 						<td>
-							<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+							<form method="post">
 								<input type="hidden" name="remove" value=<?php echo $product['id']?>>
 								<input type="submit" value="Remove">
-								<input type="text" id="ramount" name="ramount">
+							</form>
+						</td>
+						<td>
+							<form method="post">
+								<input type="hidden" name="save" value=<?php echo $product['id']?>>
+								<input type="submit" value="Save">
+								<input type="text" name="samount">
 							</form>
 						</td>
 						<?php
@@ -151,6 +195,15 @@
 					
 				} 
 			echo "</table>";
+			
+			$error = filter_input(INPUT_GET, 'error');
+			if($error === 'quantityTooHigh'){
+				echo '<span style="color: blue;">* Quantity Too High. Setting To Max.</span>';
+			}
+			else if($error === 'quantityNotAnInteger'){
+				echo '<span style="color: red;">* Quantity Must Be Number.</span>';
+			}
+			
 			echo '<br>';
 			
 			if(isset($_SESSION['user_id'])){
@@ -198,7 +251,7 @@
     		}
 		?>
 		
-		<form action="payment_page.php" method="post">
+		<form action="place_order.php" method="post">
 			<input type="hidden" name="subtotal" value=<?php echo sprintf('%.2f', $total)?>>
 			<input type="hidden" name="dCode" value=<?php echo $dCode?>>
 			<input type="submit" value="Place Order">
