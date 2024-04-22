@@ -8,7 +8,7 @@ $search_terms = filter_input(INPUT_GET, 'query', FILTER_DEFAULT, array("options"
 $sort_by = filter_input(INPUT_GET, 'sortBy', FILTER_DEFAULT, array('options' => array('default' => 'name')));
 
 // Sort by name by default if we're given invalid input
-if (strcmp($sort_by, "name") != 0 && strcmp($sort_by, "price") != 0) {
+if (strcmp($sort_by, "name") != 0 && strcmp($sort_by, "price") != 0 && strcmp($sort_by, "quantity") != 0) {
 	$sort_by = "name";
 }
 
@@ -42,7 +42,7 @@ $sql = 'SELECT p.id, p.name, p.description, p.price, p.discount, img.filepath AS
 	LEFT JOIN ProductImage img ON p.id = img.productId AND img.priority = 0
 	LEFT JOIN Inventory inv ON p.id = inv.productId AND inv.storeId = 1
 	WHERE p.name LIKE CONCAT("%", :search_terms1, "%") OR p.description LIKE CONCAT("%", :search_terms2, "%")
-	ORDER BY p.' . $sort_by . ' ' . $direction . '
+	ORDER BY ' . $sort_by . ' ' . $direction . '
 	LIMIT ' . $offset . ', ' . $RESULTS_PER_PAGE;
 
 $statement = $pdo->prepare($sql);

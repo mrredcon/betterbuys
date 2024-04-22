@@ -12,7 +12,7 @@
 	if ($products) {
 		$table = '
 		<div class="table-responsive small">
-			<table class="table table-striped table-sm">
+			<table id="tableProducts">
 				<thead>
 					<tr>
 						<th scope="col">Id</th>
@@ -26,6 +26,7 @@
 				</thead>';
 
 		// show the products as a table
+		$table .= '<tbody>';
 		foreach ($products as $product) {
 			$table .= <<<EOD
 			<tr>
@@ -51,7 +52,7 @@
 			</tr>
 			EOD;
 		}
-		$table .= "</table></div>";
+		$table .= "</tbody></table></div><script>let table = new DataTable('#tableProducts');</script>";
 	} else {
 		return "No products found!";
 	}

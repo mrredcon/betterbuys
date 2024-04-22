@@ -53,6 +53,7 @@
 		<meta name="generator" content="Hugo 0.122.0">
 		<title>Dashboard Template · Bootstrap v5.3</title>
 
+		<link href="assets/css/dataTables.min.css" rel="stylesheet">
 		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="assets/css/font-awesome.min.css">
 
@@ -62,6 +63,9 @@
 	</head>
 
 	<body>
+		<script src="assets/js/jquery-3.7.1.js"></script>
+		<script src="assets/js/dataTables.min.js"></script>
+
 		<header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
 			<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="/admin.php">Better Buys</a>
 		

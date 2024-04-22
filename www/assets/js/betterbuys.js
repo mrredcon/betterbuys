@@ -7,11 +7,13 @@ let pageNum = 1;
 function showControls() {
 	$("#btnSortPrice").show();
 	$("#btnSortName").show();
+	$("#btnSortQuantity").show();
 }
 
 function hideControls() {
 	$("#btnSortPrice").hide();
 	$("#btnSortName").hide();
+	$("#btnSortQuantity").hide();
 }
 
 function noProductsFound() {
@@ -34,8 +36,10 @@ function changeToPage(newPageNum) {
 			response = data;
 			if (sortBy === 'name') {
 				sortName(direction);
-			} else {
+			} else if (sortBy === 'price') {
 				sortPrice(direction)
+			} else if (sortBy === 'quantity') {
+				sortQuantity(direction)
 			}
 
 			drawPaginator();
@@ -48,7 +52,10 @@ function changeToPage(newPageNum) {
 function drawPaginator() {
 	const BUTTONS = 3;
 
-	const pages = Math.floor(response.total / response.entriesPerPage) + 1;
+	let pages = Math.floor(response.total / response.entriesPerPage);
+	if (pages == 0) {
+		pages = 1;
+	}
 
 	const current = response.currentPage;
 	let previous = response.currentPage - 1;
@@ -165,6 +172,20 @@ function sortPrice(direction) {
 	drawProducts();
 }
 
+function sortQuantity(direction) {
+	if (direction === "asc") {
+		response.data.sort((a, b) => {
+			return parseInt(a.quantity) - parseInt(b.quantity);
+		});
+	} else if (direction === "desc") {
+		response.data.sort((a, b) => {
+			return parseInt(b.quantity) - parseInt(a.quantity);
+		});
+	}
+
+	drawProducts();
+}
+
 function sortName(direction) {
 	if (direction === "asc") {
 		response.data.sort((a, b) => {
@@ -222,6 +243,7 @@ btnSortName.addEventListener("click", () => {
 			}
 
 			btnSortPrice.innerHTML = "Sort by price";
+			btnSortQuantity.innerHTML = "Sort by quantity";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
 			noProductsFound();
@@ -250,6 +272,36 @@ btnSortPrice.addEventListener("click", () => {
 			}
 
 			btnSortName.innerHTML = "Sort by name";
+			btnSortQuantity.innerHTML = "Sort by quantity";
+		})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			noProductsFound();
+		});
+});
+
+const btnSortQuantity = document.querySelector("#btnSortQuantity");
+btnSortQuantity.addEventListener("click", () => {
+	direction = btnSortQuantity.value;
+	sortBy = 'quantity';
+
+	$.getJSON('/products.php?query=' + query + '&page=' + pageNum + '&sortBy=' + sortBy + '&direction=' + direction)
+		.done(function(data, textStatus, jqXHR) {
+			showControls();
+			response = data;
+			sortQuantity(direction)
+
+			drawPaginator();
+
+			if (btnSortQuantity.value === "asc") {
+				btnSortQuantity.innerHTML = 'Sort by quantity <i class="icon-sort-by-order"></i>';
+				btnSortQuantity.value = "desc";
+			} else if (btnSortQuantity.value === "desc") {
+				btnSortQuantity.innerHTML = 'Sort by quantity <i class="icon-sort-by-order-alt"></i>';
+				btnSortQuantity.value = "asc";
+			}
+
+			btnSortName.innerHTML = "Sort by quantity";
+			btnSortPrice.innerHTML = "Sort by price";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
 			noProductsFound();
