@@ -165,12 +165,13 @@
 
 						<?php
 							if ($is_logged_in) {
-								echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
-								echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
-
 								if ($is_admin) {
 									echo '<li class="nav-item"><a class="nav-link text-danger" href="admin.php">Admin panel</a></li>';
+								} else {
+									echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
 								}
+
+								echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
 
 							} else {
 								echo '<li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>';
@@ -275,42 +276,38 @@
 			<div class="row">
 				<div class="col">
 					<?php
-						if(isset($_SESSION['user_id'])){
+						if(isset($_SESSION['user_id'])) {
 					?>
-		
-							<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+							<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" class="mb-3">
 								<input type="text" id="dcode" name="code">
 								<input type="submit" value="Enter Discount Code">
 							</form>
-		
 					<?php
-						}
-						else{
+						} else {
 							echo 'Please login to enter a discount code';
 						}
 					
-						if($dCode === 'ERROR'){
-							echo '<span style="color: red;">* Invalid Discount Code</span>';
+						if($dCode === 'ERROR') {
+							echo '<span style="color: red;">* Invalid Discount Code</span><br>';
 							$dCode = NULL;
 						}
 					
-						if($discountType === 'Flat'){
+						if($discountType === 'Flat') {
 							echo '<h2>Subtotal: <del>$' . sprintf('%.2f', $total) . '</del> $' . sprintf('%.2f', $total - $discountAmount) . '</h2>';
 							$total = $total - $discountAmount;
 						}
-						else if($discountType === 'Multiplier'){
+						else if($discountType === 'Multiplier') {
 							echo '<h2>Subtotal: <del>$' . sprintf('%.2f', $total) . '</del> $' . sprintf('%.2f', $total * (1 - $discountAmount)) . '</h2>';
 							$total = $total * (1 - $discountAmount);
-						}
-						else {
-							echo '<h2>Subtotal: $' . sprintf('%.2f', $total) . '</h2>';
+						} else {
+							echo 'Subtotal: $' . sprintf('%.2f', $total) . '<br>';
 						}
 						
 						echo 'Tax: $' . sprintf('%.2f', $total * .0825) . '<br>';
-						echo 'Shipping Fee: $5.00';
-						echo '<h1>Total: = $' . sprintf('%.2f', $total) + sprintf('%.2f', $total * .0825) + 5.00 . '</h1>';
+						echo 'Shipping Fee: $5.00<br><br>';
+						echo '<h1>Total: $' . sprintf('%.2f', $total) + sprintf('%.2f', $total * .0825) + 5.00 . '</h1>';
 						
-						if(!isset($_SESSION['user_id'])){
+						if(!isset($_SESSION['user_id'])) {
 							echo 'Please login to place an order';
 							exit;
 						}

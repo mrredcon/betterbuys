@@ -23,8 +23,14 @@ $pdo = require_once 'connect.php';
 
 
 // Get total count
-$sql = 'SELECT COUNT(id) FROM Product
-	WHERE name LIKE CONCAT("%", :search_terms1, "%") OR description LIKE CONCAT("%", :search_terms2, "%")';
+$sql = 'SELECT COUNT(id)
+	FROM Product p
+	LEFT JOIN Inventory inv ON p.id = inv.productId AND inv.storeId = 1
+	WHERE (name LIKE CONCAT("%", :search_terms1, "%") OR description LIKE CONCAT("%", :search_terms2, "%")) ';
+
+if ($sort_by === "quantity") {
+	$sql .= ' AND inv.quantity > 0';
+}
 
 $statement = $pdo->prepare($sql);
 
@@ -41,7 +47,12 @@ $sql = 'SELECT p.id, p.name, p.description, p.price, p.discount, img.filepath AS
 	FROM Product p
 	LEFT JOIN ProductImage img ON p.id = img.productId AND img.priority = 0
 	LEFT JOIN Inventory inv ON p.id = inv.productId AND inv.storeId = 1
-	WHERE p.name LIKE CONCAT("%", :search_terms1, "%") OR p.description LIKE CONCAT("%", :search_terms2, "%")
+	WHERE (p.name LIKE CONCAT("%", :search_terms1, "%") OR p.description LIKE CONCAT("%", :search_terms2, "%")) ';
+	if ($sort_by === "quantity") {
+		$sql .= ' AND inv.quantity > 0 ';
+	}
+
+$sql .= '
 	ORDER BY ' . $sort_by . ' ' . $direction . '
 	LIMIT ' . $offset . ', ' . $RESULTS_PER_PAGE;
 

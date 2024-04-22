@@ -119,10 +119,7 @@ function drawProducts() {
 			<div class="card" style="height: 34rem;">
 				<img class="card-img-top object-fit-contain mb-auto" style="height: 60%;" src="${product.imagePath}">
 				<div class="card-body d-flex flex-column align-items-center" style="height: 40%;">
-					<form method="post" action="product_detail.php">
-						<input type="hidden" name="product_id" value="${product.id}">
-						<button class="btn btn-link card-text flex-grow-1" style="overflow: hidden; display: -webkit-box; -webkit-line-clamp:2; line-clamp: 2; -webkit-box-orient: vertical;" href="product_detail.php">${product.name}</button>
-					</form>
+					<a class="card-text link-underline link-underline-opacity-0 link-underline-opacity-100-hover mb-2" href="product_detail.php?product_id=${product.id}">${product.name}</a>
 					<br>`
 
 					if (product.discount === null) {
@@ -300,7 +297,7 @@ btnSortQuantity.addEventListener("click", () => {
 				btnSortQuantity.value = "asc";
 			}
 
-			btnSortName.innerHTML = "Sort by quantity";
+			btnSortName.innerHTML = "Sort by name";
 			btnSortPrice.innerHTML = "Sort by price";
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {

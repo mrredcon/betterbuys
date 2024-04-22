@@ -45,13 +45,13 @@
 
 					<?php
 						if ($is_logged_in) {
-							echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
-							echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
-
 							if ($is_admin) {
 								echo '<li class="nav-item"><a class="nav-link text-danger" href="admin.php">Admin panel</a></li>';
+							} else {
+								echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
 							}
 
+							echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
 						} else {
 							echo '<li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>';
 							echo '<li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>';
@@ -82,9 +82,9 @@
 			</div>
 
 			<div class="col-12 col-sm-auto pe-0">
+				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortName" value="asc">Sort by name</button>
 				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortQuantity" value="asc">Sort by quantity</button>
 				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortPrice" value="asc">Sort by price</button>
-				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortName" value="asc">Sort by name</button>
 			</div>
 		</div>
 

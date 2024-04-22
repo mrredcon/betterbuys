@@ -16,8 +16,11 @@
 		}
 		$dCode = filter_input(INPUT_POST, 'code');
 		$expDate = filter_input(INPUT_POST, 'expiration');
+		if (!$expDate) {
+			echo '<h1>Please enter an expiration date.</h1>';
+			die();
+		}
 		
-	
 		// insert a single code
 		$sql = 'INSERT INTO DiscountCode (productId, usesRemaining, userId, flatReduction, multiplierReduction, reductionType, code, startDate, expireDate, enabled) VALUES(:productId, :usesRemaining, :userId, :flatReduction, :multiplierReduction, :reductionType, :code, :startDate, :expireDate, :enabled)';
 		

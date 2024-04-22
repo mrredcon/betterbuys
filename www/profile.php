@@ -43,7 +43,7 @@
 	    $first_name = $_POST['first_name'];
 	    $last_name = $_POST['last_name'];
 	    $address = $_POST['address'];
-	    $phone_number = $_POST['phone_number'];
+	    $phone_number = $_POST['phone_number'] ?: null;
 	    $money = $_POST['money'];
 	
 	    // Validate money amount
@@ -58,7 +58,7 @@
 	    $stmt->bindParam(':first_name', $first_name, PDO::PARAM_STR);
 	    $stmt->bindParam(':last_name', $last_name, PDO::PARAM_STR);
 	    $stmt->bindParam(':address', $address, PDO::PARAM_STR);
-	    $stmt->bindParam(':phone_number', $phone_number, PDO::PARAM_STR);
+	    $stmt->bindParam(':phone_number', $phone_number);
 	    $stmt->bindParam(':money', $money, PDO::PARAM_STR);
 	    $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 	    $stmt->execute();
