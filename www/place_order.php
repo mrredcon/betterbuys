@@ -115,8 +115,9 @@
 		<span style="color: red;">* Missing Funds. Add the needed funds to your account and try again</span>
 		<br>
 		<a href="profile.php" class="menu-item">Go to edit Profile</a>
-		<?php } else{ ?>
-		Order Placed Successfully
-		<?php } ?>
+		<?php } else {
+			echo 'Order Placed Successfully';
+			setcookie('shoppingCart', 0, time() - 3600, "/");
+		} ?>
 	</body>
 </html>
