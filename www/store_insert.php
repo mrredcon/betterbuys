@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     ]);
 
     // back to the admin page we go!
-    header('Location: admin.php');
+    header('Location: admin.php?page=stores');
     exit;
 }
 ?>

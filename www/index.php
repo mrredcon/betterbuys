@@ -33,27 +33,25 @@
 <body>
 	<nav class="navbar navbar-expand-lg bg-body-tertiary">
 		<div class="container-fluid">
-			<a class="navbar-brand" href="#" id="btnLogo">Better Buys</a>
+			<a class="navbar-brand" href="/" id="btnLogo">Better Buys</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="#" id="btnHome">Home</a>
-					</li>
+					<li class="nav-item"><a class="nav-link active" aria-current="page" href="/" id="btnHome">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="shopping_cart.php">Shopping Cart</a></li>
 
 					<?php
 						if ($is_logged_in) {
-							echo '<li class="nav-item"><a class="nav-link" href="profile.php">View Profile</a></li>';
-							echo '<li class="nav-item"><a class="nav-link" href="shopping_cart.php">Shopping Cart</a></li>';
-							echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
-
 							if ($is_admin) {
 								echo '<li class="nav-item"><a class="nav-link text-danger" href="admin.php">Admin panel</a></li>';
+							} else {
+								echo '<li class="nav-item"><a class="nav-link" href="profile.php">Profile</a></li>';
 							}
 
+							echo '<li class="nav-item"><a class="nav-link" href="logout.php">Log Out</a></li>';
 						} else {
 							echo '<li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>';
 							echo '<li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>';
@@ -83,9 +81,10 @@
 				</nav>
 			</div>
 
-			<div class="col-auto pe-0">
-				<button type="button" class="btn btn-primary me-3" id="btnSortPrice" value="asc">Sort by price</button>
-				<button type="button" class="btn btn-primary me-3" id="btnSortName" value="asc">Sort by name</button>
+			<div class="col-12 col-sm-auto pe-0">
+				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortName" value="asc">Sort by name</button>
+				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortQuantity" value="asc">Sort by quantity</button>
+				<button type="button" class="btn btn-primary me-3 my-2 my-0-sm" id="btnSortPrice" value="asc">Sort by price</button>
 			</div>
 		</div>
 

@@ -110,13 +110,14 @@
 		<?php if($error === 'Address'){ ?>
 		<span style="color: red;">* Invalid or Missing Address. Please edit your profile to include a proper address</span>
 		<br>
-		<a href="edit_profile.php" class="menu-item">Go to edit Profile</a>
+		<a href="profile.php" class="menu-item">Go to edit Profile</a>
 		<?php } else if($error === 'Money'){ ?>
 		<span style="color: red;">* Missing Funds. Add the needed funds to your account and try again</span>
 		<br>
-		<a href="edit_profile.php" class="menu-item">Go to edit Profile</a>
-		<?php } else{ ?>
-		Order Placed Successfully
-		<?php } ?>
+		<a href="profile.php" class="menu-item">Go to edit Profile</a>
+		<?php } else {
+			echo 'Order Placed Successfully';
+			setcookie('shoppingCart', 0, time() - 3600, "/");
+		} ?>
 	</body>
 </html>
