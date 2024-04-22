@@ -93,11 +93,6 @@
 						echo '<p class="my-2 me-2">You' . "'" . 're logged in as: ' . $_SESSION['login'] . '</p>';
 					}
 				?>
-
-				<form class="d-flex" role="search" id="formSearch">
-					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="inputSearch">
-					<button class="btn btn-outline-success" type="submit" id="btnSearch"><i class="icon-search"></i></button>
-				</form>
 			</div>
 		</div>
 	</nav>
