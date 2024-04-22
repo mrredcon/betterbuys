@@ -149,6 +149,7 @@
 	<head>
     		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
     		<link rel="stylesheet" href="assets/css/font-awesome.min.css">
+		<title>Better Buys: Shopping Cart</title>
 	</head>
 	<body>
 		<nav class="navbar navbar-expand-lg bg-body-tertiary">

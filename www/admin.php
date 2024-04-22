@@ -51,7 +51,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
 		<meta name="generator" content="Hugo 0.122.0">
-		<title>Dashboard Template · Bootstrap v5.3</title>
+		<title>Better Buys: Admin Dashboard</title>
 
 		<link href="assets/css/dataTables.min.css" rel="stylesheet">
 		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
