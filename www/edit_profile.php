@@ -22,6 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Check if phone number is empty
+    if (empty($phone_number)) {
+        echo "Please enter a phone number.";
+        exit();
+    }
+
     // Update user's profile info in the database
     $pdo = require_once 'connect.php';
     $sql = 'UPDATE User SET firstName=:first_name, lastName=:last_name, physicalAddress=:address, e164PhoneNumber=:phone_number, money=:money WHERE id=:user_id';
