@@ -39,6 +39,14 @@
 			<input type="submit" value="Delete database">
 		</form>
 
+
+		<!-------------------Import Products------------------>
+		<br>
+		<hr>
+		<form action="product_reader.php" method="post">
+		<input type="submit" value="Import Products from CSV">
+		</form>
+
 		<hr>
 		
 		<!-- ********************************************** -->
