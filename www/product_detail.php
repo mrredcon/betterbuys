@@ -120,8 +120,8 @@
 	#
 					# In stock?
 					if ($store_inventory < 1) {
-						echo '<h3>Not in stock</h3>';
-						echo '<h4>We\'re sorry, this item is currently not in stock</h4>';
+						echo '<h3 class="text-danger">Out of stock</h3>';
+						echo '<h4>We\'re sorry, this item is currently unavailable.</h4>';
 					} else {
 						echo '<h3>In stock</h3>';
 					}
@@ -143,39 +143,45 @@
 				?>
 				<!--Product Description end-->
 
-				<h4 class="mt-5">Availability</h4>
+				<?php
+					if ($store_inventory >= 1) {
+				?>
+						<h4 class="mt-5">Availability</h4>
 
-				<div class="mb-1"><?= $store_inventory ?> left at <b><?= $store_name ?></b></div>
+						<div class="mb-1"><?= $store_inventory ?> left at <b><?= $store_name ?></b></div>
 
-				<form method="post" action="shopping_cart.php" id="availability-form" class="row">
-					<input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+						<form method="post" action="shopping_cart.php" id="availability-form" class="row">
+							<input type="hidden" name="product_id" value="<?= $product['id'] ?>">
 
-					<!--Delivery Option start-->
-					<div class="mb-3" id="delivery">
-						<input type="radio" name="availability" value="delivery" id="delivery" required>
-						<label for="delivery" class="me-3">Delivery</label>
+							<!--Delivery Option start-->
+							<div class="mb-3" id="delivery">
+								<input type="radio" name="availability" value="delivery" id="delivery" required>
+								<label for="delivery" class="me-3">Delivery</label>
 
-						<?php
-							// Check if pickup option is available
-							if ($store_pickup == 0) {
-						?>
-								<input type="radio" name="availability" value="pickup" id="pickup">
-								<label for="pickup">Pick Up</label>
-						<?php
-							}
-						?>
+								<?php
+									// Check if pickup option is available
+									if ($store_pickup == 0) {
+								?>
+										<input type="radio" name="availability" value="pickup" id="pickup">
+										<label for="pickup">Pick Up</label>
+								<?php
+									}
+								?>
 
-					</div>
-                    			<!--Delivery Option end-->
+							</div>
+                    					<!--Delivery Option end-->
 
 
-					<div class="mb-3">
-						<label for="inputAmount" class="form-label">Desired product quantity:</label>
-						<input type="number" class="form-control" id="inputAmount" name="amount" value="1" required>
-					</div>
+							<div class="mb-3">
+								<label for="inputAmount" class="form-label">Desired product quantity:</label>
+								<input type="number" class="form-control" id="inputAmount" name="amount" value="1" required>
+							</div>
 
-					<button type="submit" class="btn btn-primary mb-2" value="Add to cart" onclick="return validateForm(<?= $store_inventory ?>);">Add Product</button>
-				</form>
+							<button type="submit" class="btn btn-primary mb-2" value="Add to cart" onclick="return validateForm(<?= $store_inventory ?>);">Add to cart</button>
+						</form>
+				<?php
+					}
+				?>
 
 				
 				<!--Validate amount inputted-->
